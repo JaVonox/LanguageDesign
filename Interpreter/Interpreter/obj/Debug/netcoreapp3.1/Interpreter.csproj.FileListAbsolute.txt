@@ -1,0 +1,8 @@
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.exe
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.csproj.AssemblyReference.cache
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.GeneratedMSBuildEditorConfig.editorconfig
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.AssemblyInfoInputs.cache
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.AssemblyInfo.cs
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.csproj.CoreCompileInputs.cache
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.dll
+\\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.pdb
