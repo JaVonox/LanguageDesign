@@ -46,20 +46,32 @@ namespace Tokens
 
             return false;
         }
-        public bool PollAllConditions(string dataSet) //Check that all contents fit the conditions
+        public List<string> PollAllConditions(string dataSet) //Check that all contents fit the conditions. 0 is false, 1 is true, 2 is some valid items
         {
-            if(startDelim != null || endDelim != null)
+
+            if (startDelim != null || endDelim != null)
             {
-                return false;
+                return null;
             }
 
             char[] chars = dataSet.ToCharArray();
             string appendedSet = "";
-            List<string> validSet = new List<string>(); ;
+            List<string> validSet = new List<string>();
 
             int stringIter = -1;
+
+            if(inType == TokenType.Operation)
+            {
+                if(TokenHandler.IsInteger(dataSet) || TokenHandler.IsDecimal(dataSet))
+                {
+                    return null;
+                }
+            }
+
             for (int i = 0; i < chars.Length; i++)
             {
+                //Look for any delimiters (such as ")
+
                 appendedSet += chars[i];
                 if (comparitor.Invoke(appendedSet))
                 {
@@ -69,30 +81,39 @@ namespace Tokens
                         stringIter = validSet.Count - 1;
                     }
 
-                    validSet[stringIter] = appendedSet;
+
+                    if (charLimit == -1)
+                    {
+                        validSet[stringIter] = appendedSet;
+                    }
+                    else
+                    {
+                        if (appendedSet.Length == charLimit)
+                        {
+                            validSet[validSet.Count -1] = appendedSet;
+                            stringIter = validSet.Count;
+                            appendedSet = "";
+                        }
+                    }
+
                 }
                 else
                 {
                     appendedSet = "";
-                    if((validSet.Count - 1) < stringIter) //set to next index in validset
+                    if((validSet.Count - 1) <= stringIter) //set to next index in validset
                     {
-                        stringIter = validSet.Count - 1;
+                        stringIter = validSet.Count;
                     }
                 }
             }
 
-            if(validSet.Count == 1 && validSet[0].Length == dataSet.Length) 
+            if(validSet.Count == 0) //No valid items
             {
-                return true;
+                return null;
             }
-            else if(validSet.Count == 0)
+            else //Multiple or single applicable
             {
-                return false;
-            }
-            else
-            {
-                Console.WriteLine("A");
-                return true;
+                return validSet;
             }
         }
     }
@@ -178,28 +199,46 @@ namespace Tokens
                     }
                     else
                     {
-                        if (!delimChar.Contains(data[i])) //If not an end char
+                        if (condRefs.Any(x => x.startDelim == data[i]) && tokens[curToken].type == null) //If item matches start delimiter
                         {
-                            TokenType? tokenTypeExists = tokens[curToken].type;
-                            if (tokenTypeExists != null)
+                            ValidateToken(ref tokens, ref curToken, ref tokenIsActive, ref delimChar, ref endChars);
+                            curToken = tokens.Count; //get ID of new token
+                            tokens.Add(new Token());
+
+                            Conditions tmpCond = condRefs.First(x => x.startDelim == data[i]);
+                            tokens[curToken].type = tmpCond.inType;
+                            if (tmpCond.endDelim != null) //If there is a valid end delimiter condition
                             {
-                                if (condRefs.First(x => x.inType == tokenTypeExists).RunConditions(data[i],tokens[curToken].contents)) //Run the conditions for the selected token type
+                                delimChar = tmpCond.endDelim.ToList();
+                            }
+                            tokenIsActive = true;
+                        }
+                        else
+                        { 
+                            if (!delimChar.Contains(data[i])) //If not an end char
+                            {
+
+                                TokenType? tokenTypeExists = tokens[curToken].type;
+                                if (tokenTypeExists != null)
+                                {
+                                    if (condRefs.First(x => x.inType == tokenTypeExists).RunConditions(data[i], tokens[curToken].contents)) //Run the conditions for the selected token type
+                                    {
+                                        tokens[curToken].contents += data[i];
+                                    }
+                                    else //If the conditions for this predetermined item are not met, throw an exception
+                                    {
+                                        throw new Exception("Predetermined Type Violation");
+                                    }
+                                }
+                                else
                                 {
                                     tokens[curToken].contents += data[i];
                                 }
-                                else //If the conditions for this predetermined item are not met, throw an exception
-                                {
-                                    throw new Exception("Predetermined Type Violation");
-                                }
                             }
-                            else
+                            else //when reaching a startchar or endchar
                             {
-                                tokens[curToken].contents += data[i];
+                                ValidateToken(ref tokens, ref curToken, ref tokenIsActive, ref delimChar, ref endChars);
                             }
-                        }
-                        else //when reaching an endchar
-                        {
-                            ValidateToken(ref tokens, ref curToken, ref tokenIsActive, ref delimChar, ref endChars);
                         }
                     }
                 }
@@ -223,22 +262,70 @@ namespace Tokens
             if (tokens[curToken].type == null)
             {
                 string contents = tokens[curToken].contents;
-                TokenType[] validTokens = condRefs.Where(x => x.PollAllConditions(contents)).Select(x => x.inType).ToArray();
+                List<(TokenType type, List<string> valid)> tokenOuts = condRefs.Where(x => x.PollAllConditions(contents) != null).Select(x=>(x.inType,x.PollAllConditions(contents).ToList())).ToList();
 
-                if(validTokens.Count() == 0)
+                if(tokenOuts.Count() == 0 || (tokenOuts.Count() > 1 && !tokenOuts.Any(x=> condRefs.First(y=>y.inType == x.type).charLimit != -1))) //If no matches or substrings with no potential dividers
                 {
                     throw new Exception("No matching token type");
                 }
-                else if (validTokens.Count() > 1) //If multiple possible tokens
+                else if (tokenOuts.Count() > 1 || tokenOuts.Sum(x=>x.valid.Count()) > 1) //If multiple possible tokens
                 {
-                        throw new Exception("Ambiguity Error Between " + validTokens.Count() + " tokens");
+                    TokenType[] set = tokenOuts.Select(x => condRefs.First(y => y.inType == x.type).inType).ToArray();
+
+                    if (!tokenOuts.Any(x => condRefs.First(y => y.inType == x.type).charLimit == 1)) //If no divider types
+                    {
+                        throw new Exception("Ambiguity Error Between " + tokenOuts.Count() + " tokens");
+                    }
+                    else
+                    {
+                        ReorderTokens(tokenOuts, contents, ref tokens, ref curToken); //Split into different values
+                    }
                 }
                 else
                 {
-                    tokens[curToken].type = validTokens[0];
+                    tokens[curToken].type = tokenOuts[0].type;
                 }
             }
         }
+
+        private static void ReorderTokens(List<(TokenType type, List<string> valid)> tokenOuts, string targetString, ref List<Token> tokens, ref int curToken)
+        {
+            tokens.RemoveAt(curToken);
+            curToken--;
+
+            char[] strSet = targetString.ToCharArray();
+
+            string curString = "";
+            foreach (char x in strSet)
+            {
+                curString += x;
+                (int typeIndex ,int strIndex) entryToRemove = (-1,-1);
+                foreach ((TokenType type, List<string> valid) components in tokenOuts)
+                {
+                    foreach(string str in components.valid)
+                    {
+                        if(curString == str)
+                        {
+                            Token tmpToken = new Token();
+                            tmpToken.contents = str;
+                            tmpToken.type = components.type;
+                            curString = "";
+                            entryToRemove = (tokenOuts.IndexOf(components), components.valid.IndexOf(str));
+
+                            tokens.Add(tmpToken);
+                            curToken++;
+                        }
+                    }
+                }
+
+                if(entryToRemove.typeIndex != -1)
+                {
+                    tokenOuts[entryToRemove.typeIndex].valid.RemoveAt(entryToRemove.strIndex); //Remove filled entry from set
+                }
+            }
+
+        }
+
         //Conditionals
         public static bool IsStringChar(string stringSet) //Always true, as no characters cannot be contained in a string. This will never flag if the delimiter conditions are not met
         {
