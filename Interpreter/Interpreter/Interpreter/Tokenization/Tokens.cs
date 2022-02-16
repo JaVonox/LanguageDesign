@@ -70,7 +70,6 @@ namespace Tokens
 
             for (int i = 0; i < chars.Length; i++)
             {
-                //Look for any delimiters (such as ")
 
                 appendedSet += chars[i];
                 if (comparitor.Invoke(appendedSet))
@@ -100,7 +99,8 @@ namespace Tokens
                 else
                 {
                     appendedSet = "";
-                    if((validSet.Count - 1) <= stringIter) //set to next index in validset
+
+                    if ((validSet.Count - 1) <= stringIter) //set to next index in validset
                     {
                         stringIter = validSet.Count;
                     }
@@ -290,6 +290,8 @@ namespace Tokens
 
         private static void ReorderTokens(List<(TokenType type, List<string> valid)> tokenOuts, string targetString, ref List<Token> tokens, ref int curToken)
         {
+            //Remove existing token and split into component parts
+
             tokens.RemoveAt(curToken);
             curToken--;
 
@@ -345,6 +347,7 @@ namespace Tokens
         public static bool IsInteger(string stringSet)
         {
             //Allow - at start, but not anywhere afterwards
+            if(IsDecimal(stringSet)) { return false; }
             char[] numofminus = stringSet.Where(x => x == '-').ToArray();
             return (stringSet.StartsWith(new string(numofminus)) && stringSet.Length > numofminus.Count() && stringSet.Where(x => x != '-').ToArray().All(y => char.IsDigit(y))); //Check that all minuses are at the start of the string, and that the string does not contain just minuses
         }
