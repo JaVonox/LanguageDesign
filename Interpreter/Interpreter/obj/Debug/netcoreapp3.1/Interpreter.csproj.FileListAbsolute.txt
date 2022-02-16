@@ -6,3 +6,17 @@
 \\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.csproj.CoreCompileInputs.cache
 \\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.dll
 \\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.pdb
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.exe
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.deps.json
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.runtimeconfig.json
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.runtimeconfig.dev.json
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.dll
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.pdb
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.csproj.AssemblyReference.cache
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.AssemblyInfoInputs.cache
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.AssemblyInfo.cs
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.csproj.CoreCompileInputs.cache
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.dll
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.pdb
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.genruntimeconfig.cache
