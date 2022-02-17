@@ -14,6 +14,7 @@ namespace Tokens
         Operation,
         Decimal,
         Bracket,
+        Boolean,
     }
     public class Token
     {
@@ -157,6 +158,7 @@ namespace Tokens
         new Conditions(TokenType.Integer,null,null,new Func<string, bool>[]{IsNumericOrDecimal},IsInteger,null), //By applying isInteger as a final conditional, we can remove all decimals.
         new Conditions(TokenType.Operation,null,new char?[]{' '},new Func<string, bool>[]{IsOperated},IsOperator,1),
         new Conditions(TokenType.Bracket,null,null,new Func<string, bool>[]{IsBrackets},null,1),
+        new Conditions(TokenType.Boolean,null,null,new Func<string,bool>[]{IsBoolChars},IsBool,null),
         };
 
         public static void CreateTokens(string data, ref List<Token> tokens)
@@ -379,9 +381,29 @@ namespace Tokens
         {
             return stringSet.StartsWith('\"');
         }
+        public static bool IsBoolChars(string stringSet)
+        {
+            List<char> tfchars = new List<char>(){ 'T', 'F', 't', 'r', 'u', 'e', 'f', 'a', 'l', 's' };
+            foreach(char a in stringSet)
+            {
+                if(!tfchars.Contains(a))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public static bool IsBool(string stringSet) //Whenever a set starts with " 
+        {
+            return stringSet == "True" || stringSet == "False" || stringSet == "true" || stringSet == "false";
+        }
         public static bool IsStringSet(string stringSet) //strings must end with "
         {
             return stringSet.EndsWith('\"');
+        }
+        public static bool IsNotKeyword(string stringSet)
+        {
+            return !IsBool(stringSet); //Append with other keyword checks
         }
         public static bool IsIdentifier(string stringSet) //Checks for identifier pattern matches
         {
@@ -422,6 +444,7 @@ namespace Tokens
         }
         private static bool IsValidIdentifier(string stringSet)
         {
+            if(!IsNotKeyword(stringSet)) { return false; }
             return stringSet.Count(x => x == '_') < stringSet.Count();
         }
         public static bool IsDecimal(string stringSet)
