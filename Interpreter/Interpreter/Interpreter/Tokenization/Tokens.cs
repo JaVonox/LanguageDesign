@@ -244,6 +244,19 @@ namespace Tokens
             {
                 Console.WriteLine("Exception while producing tokens - " + ex);
             }
+
+            foreach(Token t in tokens)
+            {
+                if(t.type == TokenType.String)
+                {
+                    t.contents = t.contents.Replace("\"", "");
+                }
+                else
+                {
+                    t.contents = t.contents.Replace(" ", "");
+                }
+            }
+
         } 
 
         private static void ValidateToken(ref List<Token> tokens, ref int curToken, ref bool tokenIsActive, ref List<char?> delimChar, ref List<char?> endChars) //Find valid type for token
@@ -297,6 +310,7 @@ namespace Tokens
                 Token tmp = tokens[curToken];
                 List<string> tokenConts = new List<string> { tmp.contents };
                 condRefs.First(x => x.inType == tmp.type).ApplyFinalConds(ref tokenConts);
+                if(tokenConts.Count == 0) { throw new Exception("No matching token type for supplied parameter"); }
                 tokens[curToken].contents = tokenConts[0]; //Apply new contents
             }
         }
