@@ -84,7 +84,7 @@ namespace Parsing
                 }
             }
 
-            while(opStack.Count > 0)
+            while(opStack.Count > 0) //Reverse the op stack
             {
                 tQueue.Enqueue(opStack.Pop());
             }
