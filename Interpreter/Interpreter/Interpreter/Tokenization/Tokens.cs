@@ -20,8 +20,114 @@ namespace Tokens
     {
         public TokenType? type;
         public string contents = "";
+        public Func<Token,Token,Token,Token?> tokenMethod;
+
+        public Token(TokenType typ, string cont)
+        {
+            type = typ;
+            contents = cont;
+            AppendTokenMethods(); //In this constructor, token methods are added immediately.
+        }
+
+        public Token() { }
+        public void AppendTokenMethods() //Append the token methods as appropriate
+        {
+            switch(type)
+            {
+                case TokenType.Integer:
+                    {
+                        tokenMethod = TokenCombination.IntegerMethods;
+                        break;
+                    }
+                case TokenType.Decimal:
+                    {
+                        tokenMethod = TokenCombination.DecimalMethods;
+                        break;
+                    }
+                case TokenType.String:
+                    {
+                        tokenMethod = TokenCombination.StringMethods;
+                        break;
+                    }
+                default:
+                    break;
+            }
+        }
     }
 
+    public static class TokenCombination //Methods for token creation
+    {
+        public static Token? IntegerMethods(Token lToken, Token rToken, Token opToken)
+        {
+            switch(rToken.type)
+            {
+                case TokenType.Integer: //Integer + Integer returns string
+                    {
+                        if(opToken.contents == "+") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) + Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "-") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) - Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "*") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) * Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else { return null; }
+                    }
+                case TokenType.Decimal:
+                    {
+                        if (opToken.contents == "+") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) + Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else { return null; }
+                    }
+                case TokenType.String:
+                    {
+                        return StringMethods(lToken, rToken, opToken);
+                    }
+                default:
+                    return null;
+            }
+        }
+
+        public static Token? DecimalMethods(Token lToken, Token rToken, Token opToken)
+        {
+            switch (rToken.type)
+            {
+                case TokenType.Integer: //Integer + Integer returns string
+                    {
+                        if (opToken.contents == "+") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) + Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else { return null; }
+                    }
+                case TokenType.Decimal:
+                    {
+                        if (opToken.contents == "+") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) + Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else { return null; }
+                    }
+                case TokenType.String:
+                    {
+                        return StringMethods(lToken, rToken, opToken);
+                    }
+                default:
+                    return null;
+            }
+
+        }
+
+        public static Token? StringMethods(Token lToken, Token rToken, Token opToken)
+        {
+            if (opToken.contents == "+")
+            {
+                return new Token(TokenType.String, lToken.contents + rToken.contents);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
     public class Conditions //Stores the conditions to apply to each token
     {
         public char? startDelim;
@@ -255,6 +361,8 @@ namespace Tokens
                 {
                     t.contents = t.contents.Replace(" ", "");
                 }
+
+                t.AppendTokenMethods(); //Append the type specific token method
             }
 
         } 

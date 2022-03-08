@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Tokens;
 using Parsing;
+using Calculating;
 
 namespace Interpreter
 { 
@@ -42,7 +43,7 @@ namespace Interpreter
                         commands.RemoveAt(iterate);
                     }
 
-                    //TODO should not parse each set. this is temporary.
+                    //TODO should not parse each set? this is temporary.
 
                     foreach(List<Token> tSet in commands) //Parse 
                     {
@@ -53,13 +54,16 @@ namespace Interpreter
                             Console.Write(outT.type + ":" + outT.contents + " ");
                         }
                         Console.WriteLine("");
+
+                        Token resultToken = Calculating.Equations.ProcessQueue(ref output);
+                        Console.WriteLine(resultToken.type + ":" + resultToken.contents); //Return string form of operation result
                     }
 
                 }
             }
             catch(Exception ex)
             {
-                Console.WriteLine("An error occured during tokenization : " + ex);
+                Console.WriteLine("An error occured: " + ex);
             }
         }
     }
