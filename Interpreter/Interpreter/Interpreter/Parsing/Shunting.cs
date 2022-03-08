@@ -13,8 +13,8 @@ namespace Parsing
             {"(",-1},
             {"/",1},
             {"*",1 },
-            {"+",2 },
             {"-",2 },
+            {"+",2 },
         };
         public static Queue<Token> ShuntingYardAlgorithm(List<Token> tokenSequence)
         {

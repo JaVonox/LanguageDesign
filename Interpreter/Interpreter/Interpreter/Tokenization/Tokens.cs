@@ -262,7 +262,7 @@ namespace Tokens
         new Conditions(TokenType.Identifier,null,null,new Func<string, bool>[]{IsIdentifier},IsValidIdentifier,null),
         new Conditions(TokenType.Decimal,null,null,new Func<string, bool>[]{ IsNumericOrDecimal, IsDecimal},IsntJustDot,null),
         new Conditions(TokenType.Integer,null,null,new Func<string, bool>[]{IsNumericOrDecimal},IsInteger,null), //By applying isInteger as a final conditional, we can remove all decimals.
-        new Conditions(TokenType.Operation,null,new char?[]{' '},new Func<string, bool>[]{IsOperated},IsOperator,1),
+        new Conditions(TokenType.Operation,null,new char?[]{' '},new Func<string, bool>[]{IsOperated},IsOperated,2),
         new Conditions(TokenType.Bracket,null,null,new Func<string, bool>[]{IsBrackets},null,1),
         new Conditions(TokenType.Boolean,null,null,new Func<string,bool>[]{IsBoolChars},IsBool,null),
         };
@@ -532,13 +532,12 @@ namespace Tokens
             if(char.IsDigit(stringSet[0]) || IsStringChar(stringSet)) { return false; } //First character cannot be a number
             return (stringSet.All(x=> char.IsLetterOrDigit(x) || x == '_'));
         }
+
         private static bool IsOperated(string stringSet) //Checks for all stringsets with
         {
-            return (stringSet == "+" || stringSet == "*" || stringSet == "/" || stringSet.Contains("-"));
-        }
-        public static bool IsOperator(string stringSet) //Checks for all stringsets containing only operations
-        {
-            return (stringSet == "+" || stringSet == "-" || stringSet == "*" || stringSet == "/");
+            return (stringSet == "+" || stringSet == "*" || stringSet == "/" || (stringSet.Contains("-") && stringSet.Length == 1)
+                || stringSet == "=" || stringSet == "==" || stringSet == "<" || stringSet == ">" || stringSet == "!"
+                || stringSet == "&" || stringSet == "|"); //& and | as and/or <-- IMPORTANT
         }
         public static bool IsInteger(string stringSet)
         {

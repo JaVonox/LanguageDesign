@@ -23,7 +23,7 @@ namespace Calculating
                         Token leftItem = tokenStack.Pop();
 
                         Token tmpToken = leftItem.tokenMethod(leftItem, rightItem, operation);
-                        if (tmpToken == null) { throw new Exception(); }
+                        if (tmpToken == null) { throw new InvalidOperationException(); }
                         else
                         {
                             tokenStack.Push(leftItem.tokenMethod(leftItem, rightItem, operation));
@@ -40,6 +40,10 @@ namespace Calculating
             catch(InvalidOperationException)
             {
                 throw new Exception("Syntax error or operation exception");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Misc exception: " + ex);
             }
         }
     }
