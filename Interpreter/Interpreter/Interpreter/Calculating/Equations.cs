@@ -18,15 +18,30 @@ namespace Calculating
                     tokenStack.Push(tokenQueue.Dequeue()); //Get next item from queue
                     if (tokenStack.Peek().type == TokenType.Operation)
                     {
-                        Token operation = tokenStack.Pop();
-                        Token rightItem = tokenStack.Pop();
-                        Token leftItem = tokenStack.Pop();
-
-                        Token tmpToken = leftItem.tokenMethod(leftItem, rightItem, operation);
-                        if (tmpToken == null) { throw new InvalidOperationException(); }
-                        else
+                        if (tokenStack.Peek().contents != "!") //For most operators
                         {
-                            tokenStack.Push(leftItem.tokenMethod(leftItem, rightItem, operation));
+                            Token operation = tokenStack.Pop();
+                            Token rightItem = tokenStack.Pop();
+                            Token leftItem = tokenStack.Pop();
+
+                            Token tmpToken = leftItem.tokenMethod(leftItem, rightItem, operation);
+                            if (tmpToken == null) { throw new InvalidOperationException(); }
+                            else
+                            {
+                                tokenStack.Push(tmpToken);
+                            }
+                        }
+                        else //For the not operator
+                        {
+                            Token operation = tokenStack.Pop();
+                            Token rightItem = tokenStack.Pop();
+
+                            Token tmpToken = Tokens.TokenCombination.NotOperator(rightItem, operation);
+                            if (tmpToken == null) { throw new InvalidOperationException(); }
+                            else
+                            {
+                                tokenStack.Push(tmpToken);
+                            }
                         }
                     }
                 }

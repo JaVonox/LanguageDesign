@@ -49,6 +49,11 @@ namespace Tokens
                         tokenMethod = TokenCombination.StringMethods;
                         break;
                     }
+                case TokenType.Boolean:
+                    {
+                        tokenMethod = TokenCombination.BooleanMethods;
+                        break;
+                    }
                 default:
                     break;
             }
@@ -61,12 +66,19 @@ namespace Tokens
         {
             switch(rToken.type)
             {
-                case TokenType.Integer: //Integer + Integer returns string
+                case TokenType.Integer:
                     {
                         if(opToken.contents == "+") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) + Convert.ToInt32(rToken.contents)).ToString()); }
                         else if (opToken.contents == "-") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) - Convert.ToInt32(rToken.contents)).ToString()); }
                         else if (opToken.contents == "*") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) * Convert.ToInt32(rToken.contents)).ToString()); }
                         else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+
+                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) < Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) > Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) <= Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) >= Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) == Convert.ToInt32(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) != Convert.ToInt32(rToken.contents)).ToString()); }
                         else { return null; }
                     }
                 case TokenType.Decimal:
@@ -75,6 +87,13 @@ namespace Tokens
                         else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
                         else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
                         else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+
+                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) < Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) > Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) <= Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) >= Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
                         else { return null; }
                     }
                 case TokenType.String:
@@ -90,12 +109,19 @@ namespace Tokens
         {
             switch (rToken.type)
             {
-                case TokenType.Integer: //Integer + Integer returns string
+                case TokenType.Integer:
                     {
                         if (opToken.contents == "+") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) + Convert.ToDecimal(rToken.contents)).ToString()); }
                         else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
                         else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
                         else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+
+                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) < Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) > Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) <= Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) >= Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) != Convert.ToDecimal(rToken.contents)).ToString()); }
                         else { return null; }
                     }
                 case TokenType.Decimal:
@@ -104,6 +130,13 @@ namespace Tokens
                         else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
                         else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
                         else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
+
+                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) < Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) > Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) <= Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) >= Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) != Convert.ToDecimal(rToken.contents)).ToString()); }
                         else { return null; }
                     }
                 case TokenType.String:
@@ -116,6 +149,38 @@ namespace Tokens
 
         }
 
+        public static Token? BooleanMethods(Token lToken, Token rToken, Token opToken)
+        {
+            switch (rToken.type)
+            {
+                case TokenType.Boolean:
+                    {
+                        if (opToken.contents == "&&") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) && Convert.ToBoolean(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "||") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) || Convert.ToBoolean(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) == Convert.ToBoolean(rToken.contents)).ToString()); }
+                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) != Convert.ToBoolean(rToken.contents)).ToString()); }
+                        else { return null; }
+                    }
+                default:
+                    return null;
+            }
+
+        }
+
+        public static Token? NotOperator(Token rToken, Token opToken) //This is a special command reserved for reversing a single bool
+        {
+            switch (rToken.type)
+            {
+                case TokenType.Boolean:
+                    {
+                        if (opToken.contents == "!") { return new Token(TokenType.Boolean, (!Convert.ToBoolean(rToken.contents)).ToString()); }
+                        else { return null; }
+                    }
+                default:
+                    return null;
+            }
+        }
+
         public static Token? StringMethods(Token lToken, Token rToken, Token opToken)
         {
             if (opToken.contents == "+")
@@ -124,7 +189,17 @@ namespace Tokens
             }
             else
             {
-                return null;
+                switch (rToken.type)
+                {
+                    case TokenType.String:
+                        {
+                            if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) == Convert.ToBoolean(rToken.contents)).ToString()); }
+                            else { return null; }
+                        }
+                    default:
+                        return null;
+                }
+
             }
         }
     }
@@ -195,7 +270,7 @@ namespace Tokens
 
                                 validSet[stringIter] = appendedSet;
 
-                                if (maxLen != null && validSet.Count >= maxLen)
+                                if (maxLen != null && appendedSet.Length >= maxLen)
                                 {
                                     appendedSet = "";
                                     needNewIndex = true;
@@ -262,7 +337,7 @@ namespace Tokens
         new Conditions(TokenType.Identifier,null,null,new Func<string, bool>[]{IsIdentifier},IsValidIdentifier,null),
         new Conditions(TokenType.Decimal,null,null,new Func<string, bool>[]{ IsNumericOrDecimal, IsDecimal},IsntJustDot,null),
         new Conditions(TokenType.Integer,null,null,new Func<string, bool>[]{IsNumericOrDecimal},IsInteger,null), //By applying isInteger as a final conditional, we can remove all decimals.
-        new Conditions(TokenType.Operation,null,new char?[]{' '},new Func<string, bool>[]{IsOperated},IsOperated,2),
+        new Conditions(TokenType.Operation,null,null,new Func<string, bool>[]{IsOperatorChar},IsOperated,2),
         new Conditions(TokenType.Bracket,null,null,new Func<string, bool>[]{IsBrackets},null,1),
         new Conditions(TokenType.Boolean,null,null,new Func<string,bool>[]{IsBoolChars},IsBool,null),
         };
@@ -459,7 +534,8 @@ namespace Tokens
                                     bool isSkip = false; //If the previous value is a deductable then do not connect
                                     if(tokenSet.Count >= 2)
                                     {
-                                        if(tokenSet[tokenSet.Count-2].type == TokenType.Integer || tokenSet[tokenSet.Count - 2].type == TokenType.Decimal || tokenSet[tokenSet.Count - 2].type == TokenType.Identifier)
+                                        //If it is anything that can be minused
+                                        if(tokenSet[tokenSet.Count-2].type == TokenType.Integer || tokenSet[tokenSet.Count - 2].type == TokenType.Decimal || tokenSet[tokenSet.Count - 2].type == TokenType.Identifier ||tokenSet[tokenSet.Count - 2].type == TokenType.Bracket)
                                         {
                                             isSkip = true;
                                         }
@@ -533,11 +609,22 @@ namespace Tokens
             return (stringSet.All(x=> char.IsLetterOrDigit(x) || x == '_'));
         }
 
+        private static bool IsOperatorChar(string stringSet)
+        {
+            List<string> opChars = new List<string>() { "+", "*", "/", "-", "=", "<", ">", "&", "|", "!" };
+            return (opChars.Contains(stringSet) || IsOperated(stringSet));
+        }
         private static bool IsOperated(string stringSet) //Checks for all stringsets with
         {
-            return (stringSet == "+" || stringSet == "*" || stringSet == "/" || (stringSet.Contains("-") && stringSet.Length == 1)
-                || stringSet == "=" || stringSet == "==" || stringSet == "<" || stringSet == ">" || stringSet == "!"
-                || stringSet == "&" || stringSet == "|"); //& and | as and/or <-- IMPORTANT
+            if (stringSet.Length == 1)
+            {
+                return (stringSet == "+" || stringSet == "*" || stringSet == "/" || stringSet == "-"
+                    || stringSet == "=" || stringSet == "<" || stringSet == ">" || stringSet=="!");
+            }
+            else
+            {
+                return (stringSet == "==" ||stringSet == "<=" || stringSet == ">=" || stringSet == "&&" || stringSet == "||" || stringSet == "!=");
+            }
         }
         public static bool IsInteger(string stringSet)
         {
