@@ -26,3 +26,6 @@ C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\De
 \\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.dll
 \\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\Interpreter.pdb
 \\university.ds.derby.ac.uk\dfs\Student\Home\100505349\Github\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.genruntimeconfig.cache
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\bin\Debug\netcoreapp3.1\CodeFile.txt
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.Properties.Resources.resources
+C:\Users\redss\Desktop\GithubRepos\LanguageDesign\Interpreter\Interpreter\obj\Debug\netcoreapp3.1\Interpreter.csproj.GenerateResource.cache

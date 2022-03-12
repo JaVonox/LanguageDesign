@@ -193,7 +193,8 @@ namespace Tokens
                 {
                     case TokenType.String:
                         {
-                            if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) == Convert.ToBoolean(rToken.contents)).ToString()); }
+                            if (opToken.contents == "==") { return new Token(TokenType.Boolean, (lToken.contents == rToken.contents).ToString()); }
+                            if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (lToken.contents != rToken.contents).ToString()); }
                             else { return null; }
                         }
                     default:
