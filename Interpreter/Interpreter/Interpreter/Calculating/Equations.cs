@@ -3,50 +3,51 @@ using System.Collections.Generic;
 using System.Text;
 using Parsing;
 using Tokens;
-
+using Nodes;
+using NodeOperations;
 namespace Calculating
 {
     class Equations
     {
-        public static Token ProcessQueue(ref Queue<Token> tokenQueue) //Processes the result of a postfix/prefix queue
+        public static Node ProcessQueue(ref Queue<Node> nodeQueue) //Processes the result of a postfix/prefix queue
         {
             try
             {
-                Stack<Token> tokenStack = new Stack<Token>();
-                while (tokenQueue.Count > 0)
+                Stack<Node> nodeStack = new Stack<Node>();
+                while (nodeQueue.Count > 0)
                 {
-                    tokenStack.Push(tokenQueue.Dequeue()); //Get next item from queue
-                    if (tokenStack.Peek().type == TokenType.Operation)
+                    nodeStack.Push(nodeQueue.Dequeue()); //Get next item from queue
+                    if (nodeStack.Peek().type == NodeContentType.Operation)
                     {
-                        if (tokenStack.Peek().contents != "!") //For most operators
+                        if (nodeStack.Peek().contents != "!") //For most operators
                         {
-                            Token operation = tokenStack.Pop();
-                            Token rightItem = tokenStack.Pop();
-                            Token leftItem = tokenStack.Pop();
+                            Node operation = nodeStack.Pop();
+                            Node rightItem = nodeStack.Pop();
+                            Node leftItem = nodeStack.Pop();
 
-                            Token tmpToken = leftItem.tokenMethod(leftItem, rightItem, operation);
-                            if (tmpToken == null) { throw new InvalidOperationException(); }
+                            Node tmpNode = leftItem.itemMethod(leftItem, rightItem, operation);
+                            if (tmpNode == null) { throw new InvalidOperationException(); }
                             else
                             {
-                                tokenStack.Push(tmpToken);
+                                nodeStack.Push(tmpNode);
                             }
                         }
                         else //For the not operator
                         {
-                            Token operation = tokenStack.Pop();
-                            Token rightItem = tokenStack.Pop();
+                            Node operation = nodeStack.Pop();
+                            Node rightItem = nodeStack.Pop();
 
-                            Token tmpToken = Tokens.TokenCombination.NotOperator(rightItem, operation);
+                            Node tmpToken = OperatorDefinitions.NotOperator(rightItem, operation);
                             if (tmpToken == null) { throw new InvalidOperationException(); }
                             else
                             {
-                                tokenStack.Push(tmpToken);
+                                nodeStack.Push(tmpToken);
                             }
                         }
                     }
                 }
 
-                return tokenStack.Pop();
+                return nodeStack.Pop();
             }
             catch(ArithmeticException)
             {

@@ -4,6 +4,7 @@ using System.Text;
 using Tokens;
 using Parsing;
 using Calculating;
+using Nodes;
 
 namespace Interpreter
 { 
@@ -22,7 +23,7 @@ namespace Interpreter
                     int iterate = -1; //Index for sorting tokens into command sets
                     foreach (Token t in tokens)
                     {
-                        if (t.type == TokenType.End || iterate == -1)
+                        if (t.type == NodeContentType.End || iterate == -1)
                         {
                             iterate++;
                             commands.Add(new List<Token>() { });
@@ -45,17 +46,27 @@ namespace Interpreter
 
                     //TODO should not parse each set? this is temporary.
 
-                    foreach(List<Token> tSet in commands) //Parse 
-                    {
-                        Queue<Token> output = Parsing.Shunting.ShuntingYardAlgorithm(tSet);
+                    //TEMPORARY CONVERT ALL TO NODE SET
+                    //REPLACE WITH ABSTRACT SYNTAX TREE
 
-                        foreach(Token outT in output)
+                    foreach (List<Token> tSet in commands) //Parse 
+                    {
+                        List<Node> nodeSet = new List<Node>();
+
+                        foreach(Token t in tSet) //TODO FIX THIS TO USE SYNTAX TREE  
                         {
-                            Console.Write(outT.type + ":" + outT.contents + " ");
+                            nodeSet.Add(new Node(t));
+                        }
+
+                        Queue<Node> output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet);
+
+                        foreach(Node outNode in output)
+                        {
+                            Console.Write(outNode.type + ":" + outNode.contents + " ");
                         }
                         Console.WriteLine("");
 
-                        Token resultToken = Calculating.Equations.ProcessQueue(ref output);
+                        Node resultToken = Calculating.Equations.ProcessQueue(ref output);
                         Console.WriteLine(resultToken.type + ":" + resultToken.contents); //Return string form of operation result
                     }
 

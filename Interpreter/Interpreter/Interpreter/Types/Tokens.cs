@@ -2,207 +2,21 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-
+using Nodes;
 namespace Tokens
 {
-    public enum TokenType
-    {
-        End,
-        Identifier,
-        String,
-        Integer,
-        Operation,
-        Decimal,
-        Bracket,
-        Boolean,
-    }
     public class Token
     {
-        public TokenType? type;
+        public NodeContentType? type;
         public string contents = "";
-        public Func<Token,Token,Token,Token?> tokenMethod;
 
-        public Token(TokenType typ, string cont)
+        public Token(NodeContentType typ, string cont)
         {
             type = typ;
             contents = cont;
-            AppendTokenMethods(); //In this constructor, token methods are added immediately.
         }
 
         public Token() { }
-        public void AppendTokenMethods() //Append the token methods as appropriate
-        {
-            switch(type)
-            {
-                case TokenType.Integer:
-                    {
-                        tokenMethod = TokenCombination.IntegerMethods;
-                        break;
-                    }
-                case TokenType.Decimal:
-                    {
-                        tokenMethod = TokenCombination.DecimalMethods;
-                        break;
-                    }
-                case TokenType.String:
-                    {
-                        tokenMethod = TokenCombination.StringMethods;
-                        break;
-                    }
-                case TokenType.Boolean:
-                    {
-                        tokenMethod = TokenCombination.BooleanMethods;
-                        break;
-                    }
-                default:
-                    break;
-            }
-        }
-    }
-
-    public static class TokenCombination //Methods for token creation
-    {
-        public static Token? IntegerMethods(Token lToken, Token rToken, Token opToken)
-        {
-            switch(rToken.type)
-            {
-                case TokenType.Integer:
-                    {
-                        if(opToken.contents == "+") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) + Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "-") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) - Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "*") { return new Token(TokenType.Integer, (Convert.ToInt32(lToken.contents) * Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
-
-                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) < Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) > Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) <= Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) >= Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) == Convert.ToInt32(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToInt32(lToken.contents) != Convert.ToInt32(rToken.contents)).ToString()); }
-                        else { return null; }
-                    }
-                case TokenType.Decimal:
-                    {
-                        if (opToken.contents == "+") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) + Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
-
-                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) < Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) > Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) <= Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) >= Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else { return null; }
-                    }
-                case TokenType.String:
-                    {
-                        return StringMethods(lToken, rToken, opToken);
-                    }
-                default:
-                    return null;
-            }
-        }
-
-        public static Token? DecimalMethods(Token lToken, Token rToken, Token opToken)
-        {
-            switch (rToken.type)
-            {
-                case TokenType.Integer:
-                    {
-                        if (opToken.contents == "+") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) + Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
-
-                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) < Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) > Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) <= Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) >= Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) != Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else { return null; }
-                    }
-                case TokenType.Decimal:
-                    {
-                        if (opToken.contents == "+") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) + Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "-") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) - Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "*") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) * Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "/") { return new Token(TokenType.Decimal, (Convert.ToDecimal(lToken.contents) / Convert.ToDecimal(rToken.contents)).ToString()); }
-
-                        else if (opToken.contents == "<") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) < Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) > Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "<=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) <= Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == ">=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) >= Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) == Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToDecimal(lToken.contents) != Convert.ToDecimal(rToken.contents)).ToString()); }
-                        else { return null; }
-                    }
-                case TokenType.String:
-                    {
-                        return StringMethods(lToken, rToken, opToken);
-                    }
-                default:
-                    return null;
-            }
-
-        }
-
-        public static Token? BooleanMethods(Token lToken, Token rToken, Token opToken)
-        {
-            switch (rToken.type)
-            {
-                case TokenType.Boolean:
-                    {
-                        if (opToken.contents == "&&") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) && Convert.ToBoolean(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "||") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) || Convert.ToBoolean(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "==") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) == Convert.ToBoolean(rToken.contents)).ToString()); }
-                        else if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (Convert.ToBoolean(lToken.contents) != Convert.ToBoolean(rToken.contents)).ToString()); }
-                        else { return null; }
-                    }
-                default:
-                    return null;
-            }
-
-        }
-
-        public static Token? NotOperator(Token rToken, Token opToken) //This is a special command reserved for reversing a single bool
-        {
-            switch (rToken.type)
-            {
-                case TokenType.Boolean:
-                    {
-                        if (opToken.contents == "!") { return new Token(TokenType.Boolean, (!Convert.ToBoolean(rToken.contents)).ToString()); }
-                        else { return null; }
-                    }
-                default:
-                    return null;
-            }
-        }
-
-        public static Token? StringMethods(Token lToken, Token rToken, Token opToken)
-        {
-            if (opToken.contents == "+")
-            {
-                return new Token(TokenType.String, lToken.contents + rToken.contents);
-            }
-            else
-            {
-                switch (rToken.type)
-                {
-                    case TokenType.String:
-                        {
-                            if (opToken.contents == "==") { return new Token(TokenType.Boolean, (lToken.contents == rToken.contents).ToString()); }
-                            if (opToken.contents == "!=") { return new Token(TokenType.Boolean, (lToken.contents != rToken.contents).ToString()); }
-                            else { return null; }
-                        }
-                    default:
-                        return null;
-                }
-
-            }
-        }
     }
     public class Conditions //Stores the conditions to apply to each token
     {
@@ -211,8 +25,8 @@ namespace Tokens
         public Func<string,bool>[] comparitors;
         public Func<string, bool> finalCheck;
         public int? maxLen;
-        public TokenType inType;
-        public Conditions(TokenType type, char? sDelim, char?[] eDelim, Func<string,bool>[] comparitive, Func<string,bool> fCheck, int? mLen)
+        public NodeContentType inType;
+        public Conditions(NodeContentType type, char? sDelim, char?[] eDelim, Func<string,bool>[] comparitive, Func<string,bool> fCheck, int? mLen)
         {
             startDelim = sDelim;
             endDelim = eDelim;
@@ -244,7 +58,7 @@ namespace Tokens
                         if (conditionsMet == comparitors.Count()) //If this has met all the conditions
                         {
                             bool isStringStart = false;
-                            if(inType == TokenType.String) //This only occurs if a string is connected to other values
+                            if(inType == NodeContentType.String) //This only occurs if a string is connected to other values
                             {
                                 if(appendedSet.Count(x => x == '\"') % 2 == 1)
                                 {
@@ -331,16 +145,16 @@ namespace Tokens
 
     public static class TokenHandler
     {
-        //Sets conditions for each tokentype
+        //Sets conditions for each NodeContentType
         public static Conditions[] condRefs =
         {
-        new Conditions(TokenType.String,'"',new char?[]{'"'},new Func<string,bool>[]{IsStringChar},IsStringSet,null),
-        new Conditions(TokenType.Identifier,null,null,new Func<string, bool>[]{IsIdentifier},IsValidIdentifier,null),
-        new Conditions(TokenType.Decimal,null,null,new Func<string, bool>[]{ IsNumericOrDecimal, IsDecimal},IsntJustDot,null),
-        new Conditions(TokenType.Integer,null,null,new Func<string, bool>[]{IsNumericOrDecimal},IsInteger,null), //By applying isInteger as a final conditional, we can remove all decimals.
-        new Conditions(TokenType.Operation,null,null,new Func<string, bool>[]{IsOperatorChar},IsOperated,2),
-        new Conditions(TokenType.Bracket,null,null,new Func<string, bool>[]{IsBrackets},null,1),
-        new Conditions(TokenType.Boolean,null,null,new Func<string,bool>[]{IsBoolChars},IsBool,null),
+        new Conditions(NodeContentType.String,'"',new char?[]{'"'},new Func<string,bool>[]{IsStringChar},IsStringSet,null),
+        new Conditions(NodeContentType.Identifier,null,null,new Func<string, bool>[]{IsIdentifier},IsValidIdentifier,null),
+        new Conditions(NodeContentType.Decimal,null,null,new Func<string, bool>[]{ IsNumericOrDecimal, IsDecimal},IsntJustDot,null),
+        new Conditions(NodeContentType.Integer,null,null,new Func<string, bool>[]{IsNumericOrDecimal},IsInteger,null), //By applying isInteger as a final conditional, we can remove all decimals.
+        new Conditions(NodeContentType.Operation,null,null,new Func<string, bool>[]{IsOperatorChar},IsOperated,2),
+        new Conditions(NodeContentType.Bracket,null,null,new Func<string, bool>[]{IsBrackets},null,1),
+        new Conditions(NodeContentType.Boolean,null,null,new Func<string,bool>[]{IsBoolChars},IsBool,null),
         };
 
         public static void CreateTokens(string data, ref List<Token> tokens)
@@ -369,7 +183,7 @@ namespace Tokens
                         }
 
                         Token endToken = new Token();
-                        endToken.type = TokenType.End;
+                        endToken.type = NodeContentType.End;
                         endToken.contents = ";";
                         tokens.Add(endToken);
                         delimChar = endChars; //Reset delimiters
@@ -429,7 +243,7 @@ namespace Tokens
 
             foreach(Token t in tokens)
             {
-                if(t.type == TokenType.String)
+                if(t.type == NodeContentType.String)
                 {
                     t.contents = t.contents.Replace("\"", "");
                 }
@@ -438,7 +252,6 @@ namespace Tokens
                     t.contents = t.contents.Replace(" ", "");
                 }
 
-                t.AppendTokenMethods(); //Append the type specific token method
             }
 
         } 
@@ -451,7 +264,7 @@ namespace Tokens
             if (tokens[curToken].type == null)
             {
                 string contents = tokens[curToken].contents;
-                List<(TokenType type, List<string> valid)> tokenOuts =  condRefs.Select(x=> new { cond = x.PollAllConditions(contents), type = x.inType}).Where(y=> y.cond != null).Select(z => (z.type, z.cond.ToList())).ToList();
+                List<(NodeContentType type, List<string> valid)> tokenOuts =  condRefs.Select(x=> new { cond = x.PollAllConditions(contents), type = x.inType}).Where(y=> y.cond != null).Select(z => (z.type, z.cond.ToList())).ToList();
 
                 if (tokenOuts.Count() == 0) //If no matches
                 {
@@ -499,7 +312,7 @@ namespace Tokens
             }
         }
 
-        private static bool ReorderTokens(List<(TokenType type, List<string> valid)> tokenOuts, string targetString, ref List<Token> tokens, ref int curToken, ref List<char?>delimChars)
+        private static bool ReorderTokens(List<(NodeContentType type, List<string> valid)> tokenOuts, string targetString, ref List<Token> tokens, ref int curToken, ref List<char?>delimChars)
         {
             //Remove existing token and split into component parts
 
@@ -514,7 +327,7 @@ namespace Tokens
             {
                 curString += x;
                 (int typeIndex ,int strIndex) entryToRemove = (-1,-1);
-                foreach ((TokenType type, List<string> valid) components in tokenOuts)
+                foreach ((NodeContentType type, List<string> valid) components in tokenOuts)
                 {
                     if(components.valid.Count >= 1)
                     {
@@ -528,15 +341,15 @@ namespace Tokens
                             entryToRemove = (tokenOuts.IndexOf(components), components.valid.IndexOf(str));
                             removedChars += str.Length;
 
-                            if(tokenSet.Count > 0 && (tmpToken.type == TokenType.Integer || tmpToken.type == TokenType.Decimal)) //Combine negatives when put together
+                            if(tokenSet.Count > 0 && (tmpToken.type == NodeContentType.Integer || tmpToken.type == NodeContentType.Decimal)) //Combine negatives when put together
                             {
-                                if(tokenSet[tokenSet.Count - 1].type == TokenType.Operation && tokenSet[tokenSet.Count - 1].contents == "-")
+                                if(tokenSet[tokenSet.Count - 1].type == NodeContentType.Operation && tokenSet[tokenSet.Count - 1].contents == "-")
                                 {
                                     bool isSkip = false; //If the previous value is a deductable then do not connect
                                     if(tokenSet.Count >= 2)
                                     {
                                         //If it is anything that can be minused
-                                        if(tokenSet[tokenSet.Count-2].type == TokenType.Integer || tokenSet[tokenSet.Count - 2].type == TokenType.Decimal || tokenSet[tokenSet.Count - 2].type == TokenType.Identifier ||tokenSet[tokenSet.Count - 2].type == TokenType.Bracket)
+                                        if(tokenSet[tokenSet.Count-2].type == NodeContentType.Integer || tokenSet[tokenSet.Count - 2].type == NodeContentType.Decimal || tokenSet[tokenSet.Count - 2].type == NodeContentType.Identifier ||tokenSet[tokenSet.Count - 2].type == NodeContentType.Bracket)
                                         {
                                             isSkip = true;
                                         }
