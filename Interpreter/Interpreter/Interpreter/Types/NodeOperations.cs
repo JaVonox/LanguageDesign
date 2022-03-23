@@ -24,7 +24,7 @@ namespace NodeOperations
                         else if (opNode.contents == ">=") { return new Node(NodeContentType.Boolean, (Convert.ToInt32(lNode.contents) >= Convert.ToInt32(rNode.contents)).ToString()); }
                         else if (opNode.contents == "==") { return new Node(NodeContentType.Boolean, (Convert.ToInt32(lNode.contents) == Convert.ToInt32(rNode.contents)).ToString()); }
                         else if (opNode.contents == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToInt32(lNode.contents) != Convert.ToInt32(rNode.contents)).ToString()); }
-                        else { return null; }
+                        else { throw new Exception("Invalid operation attempted"); }
                     }
                 case NodeContentType.Decimal:
                     {
@@ -39,14 +39,14 @@ namespace NodeOperations
                         else if (opNode.contents == ">=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) >= Convert.ToDecimal(rNode.contents)).ToString()); }
                         else if (opNode.contents == "==") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
                         else if (opNode.contents == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else { return null; }
+                        else { throw new Exception("Invalid operation attempted"); }
                     }
                 case NodeContentType.String:
                     {
                         return StringMethods(lNode, rNode, opNode);
                     }
                 default:
-                    return null;
+                    throw new Exception("Invalid operation attempted");
             }
         }
 
@@ -67,7 +67,7 @@ namespace NodeOperations
                         else if (opNode.contents == ">=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) >= Convert.ToDecimal(rNode.contents)).ToString()); }
                         else if (opNode.contents == "==") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
                         else if (opNode.contents == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) != Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else { return null; }
+                        else { throw new Exception("Invalid operation attempted"); }
                     }
                 case NodeContentType.Decimal:
                     {
@@ -82,32 +82,51 @@ namespace NodeOperations
                         else if (opNode.contents == ">=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) >= Convert.ToDecimal(rNode.contents)).ToString()); }
                         else if (opNode.contents == "==") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
                         else if (opNode.contents == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) != Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else { return null; }
+                        else { throw new Exception("Invalid operation attempted"); }
                     }
                 case NodeContentType.String:
                     {
                         return StringMethods(lNode, rNode, opNode);
                     }
                 default:
-                    return null;
+                    throw new Exception("Invalid operation attempted");
             }
 
         }
 
         public static Node? BooleanMethods(Node lNode, Node rNode, Node opNode)
         {
-            switch (rNode.type)
+            if (opNode.contents == "!") //Special operation
             {
-                case NodeContentType.Boolean:
-                    {
-                        if (opNode.contents == "&&") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) && Convert.ToBoolean(rNode.contents)).ToString()); }
-                        else if (opNode.contents == "||") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) || Convert.ToBoolean(rNode.contents)).ToString()); }
-                        else if (opNode.contents == "==") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) == Convert.ToBoolean(rNode.contents)).ToString()); }
-                        else if (opNode.contents == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) != Convert.ToBoolean(rNode.contents)).ToString()); }
-                        else { return null; }
-                    }
-                default:
-                    return null;
+                if (lNode != null && rNode != null) { throw new Exception("Invalid parameters in not clause"); }
+                else if (lNode != null)
+                {
+                    return NotOperator(lNode, opNode);
+                }
+                else if (rNode != null)
+                {
+                    return NotOperator(rNode, opNode);
+                }
+                else
+                {
+                    throw new Exception("Invalid operation attempted");
+                }
+            }
+            else
+            {
+                switch (rNode.type)
+                {
+                    case NodeContentType.Boolean:
+                        {
+                            if (opNode.contents == "&&") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) && Convert.ToBoolean(rNode.contents)).ToString()); }
+                            else if (opNode.contents == "||") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) || Convert.ToBoolean(rNode.contents)).ToString()); }
+                            else if (opNode.contents == "==") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) == Convert.ToBoolean(rNode.contents)).ToString()); }
+                            else if (opNode.contents == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) != Convert.ToBoolean(rNode.contents)).ToString()); }
+                            else { throw new Exception("Invalid operation attempted"); }
+                        }
+                    default:
+                        throw new Exception("Invalid operation attempted");
+                }
             }
 
         }
@@ -119,10 +138,10 @@ namespace NodeOperations
                 case NodeContentType.Boolean:
                     {
                         if (opNode.contents == "!") { return new Node(NodeContentType.Boolean, (!Convert.ToBoolean(rNode.contents)).ToString()); }
-                        else { return null; }
+                        else { throw new Exception("Invalid operation attempted"); }
                     }
                 default:
-                    return null;
+                    throw new Exception("Invalid operation attempted");
             }
         }
 
@@ -140,10 +159,10 @@ namespace NodeOperations
                         {
                             if (opNode.contents == "==") { return new Node(NodeContentType.Boolean, (lNode.contents == rNode.contents).ToString()); }
                             if (opNode.contents == "!=") { return new Node(NodeContentType.Boolean, (lNode.contents != rNode.contents).ToString()); }
-                            else { return null; }
+                            else { throw new Exception("Invalid operation attempted"); }
                         }
                     default:
-                        return null;
+                        throw new Exception("Invalid operation attempted");
                 }
 
             }

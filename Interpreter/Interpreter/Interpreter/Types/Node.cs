@@ -43,8 +43,8 @@ namespace Nodes
         public Func<Node, Node, Node, Node?> itemMethod;
         public Node(Token parentToken)
         {
-            type = (NodeContentType)parentToken.type;
             contents = parentToken.contents;
+            type = (NodeContentType)parentToken.type;
             AppendOperations();
         }
         public Node(NodeContentType typ, string cont)
@@ -106,7 +106,7 @@ namespace Nodes
             string corrString = "(";
             corrString += myNode.contents;
 
-            if (leftNode._item != null)
+            if (leftNode != null)
             {
                 if (leftNode._item.GetType() == typeof(Tree))
                 {
@@ -117,8 +117,12 @@ namespace Nodes
                     corrString += ((Node)leftNode._item).contents;
                 }
             }
+            else
+            {
+                corrString += "<NULL>";
+            }
 
-            if (rightNode._item != null)
+            if (rightNode != null)
             {
                 if (rightNode._item.GetType() == typeof(Tree))
                 {
@@ -129,35 +133,73 @@ namespace Nodes
                     corrString += ((Node)rightNode._item).contents;
                 }
             }
+            else
+            {
+                corrString += "<NULL>";
+            }
 
             corrString += ")";
 
             return corrString;
         }
-        public Node CalculateTreeResult()
+        public Node? CalculateTreeResult()
         {
-            Node leftValue;
-            Node rightValue;
+            Node? leftValue = null;
+            Node? rightValue = null;
 
-            if(leftNode._item.GetType() == typeof(Node))
+            if (leftNode != null)
             {
-                leftValue = new Node((Node)(leftNode._item)); //Get node value
+                if (leftNode._item.GetType() == typeof(Node))
+                {
+                    leftValue = new Node((Node)(leftNode._item)); //Get node value
+                }
+                else
+                {
+                    leftValue = new Node(((Tree)(leftNode._item)).CalculateTreeResult()); //Get tree result from this item
+                }
+            }
+
+            if (rightNode != null)
+            {
+                if (rightNode._item.GetType() == typeof(Node))
+                {
+                    rightValue = new Node((Node)(rightNode._item)); //Get node value
+                }
+                else
+                {
+                    rightValue = new Node(((Tree)(rightNode._item)).CalculateTreeResult()); //Get tree result from this item
+                }
+            }
+
+            if (myNode.type == NodeContentType.End)
+            {
+                if(leftValue != null && rightValue == null)
+                {
+                    return leftValue;
+                }
+                else if(leftValue == null && rightValue != null)
+                {
+                    return rightValue;
+                }
+                else if(leftValue == null && rightValue == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    throw new Exception("END NODE HAD MULTIPLE VALUES");
+                    return null;
+                }
+            }
+            else if(leftValue != null || rightValue != null)
+            {
+                return leftValue.itemMethod(leftValue, rightValue, myNode); //Use operator to calculate result of the query
             }
             else
             {
-                leftValue = new Node(((Tree)(leftNode._item)).CalculateTreeResult()); //Get tree result from this item
+                throw new Exception("Calculation Error");
+                return null;
             }
-
-            if (rightNode._item.GetType() == typeof(Node))
-            {
-                rightValue = new Node((Node)(rightNode._item)); //Get node value
-            }
-            else
-            {
-                rightValue = new Node(((Tree)(rightNode._item)).CalculateTreeResult()); //Get tree result from this item
-            }
-
-            return leftValue.itemMethod(leftValue, rightValue, myNode); //Use operator to calculate result of the query
         }
     }
 }

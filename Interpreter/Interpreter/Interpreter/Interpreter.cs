@@ -45,33 +45,30 @@ namespace Interpreter
                         commands.RemoveAt(iterate);
                     }
 
-                    //TODO should not parse each set? this is temporary.
-
-                    //TEMPORARY CONVERT ALL TO NODE SET
-                    //REPLACE WITH ABSTRACT SYNTAX TREE
-
                     foreach (List<Token> tSet in commands) //Parse 
                     {
-                        List<Node> nodeSet = new List<Node>();
-
-                        foreach(Token t in tSet) //TODO FIX THIS TO USE SYNTAX TREE  
+                        List<Node> nodeSet = new List<Node>(); //Convert tokens to nodes
+                        foreach(Token t in tSet) 
                         {
                             nodeSet.Add(new Node(t));
                         }
 
-                        Queue<Node> output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet);
-
-                        foreach(Node outNode in output)
-                        {
-                            Console.Write(outNode.type + ":" + outNode.contents + " ");
-                        }
-
+                        Queue<Node> output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet); //Convert to postfix
+                        output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
                         Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output);
 
-                        Console.WriteLine(" -> " + syntaxTree.PrintTreeContents());
+                        Console.WriteLine(syntaxTree.PrintTreeContents()); //Print contents (SHOWS WITHOUT TYPE - MAYBE FIX?)
 
-                        Node resultSyn = syntaxTree.CalculateTreeResult(); //Evaluate conditions of tree
-                        Console.WriteLine(resultSyn.type + ":" + resultSyn.contents);
+                        Node? resultSyn = syntaxTree.CalculateTreeResult(); //Evaluate conditions of tree
+
+                        if (resultSyn != null)
+                        {
+                            Console.WriteLine(resultSyn.type + ":" + resultSyn.contents);
+                        }
+                        else
+                        {
+                            Console.WriteLine("<NULL>");
+                        }
                         Console.WriteLine("\n");
                     }
 

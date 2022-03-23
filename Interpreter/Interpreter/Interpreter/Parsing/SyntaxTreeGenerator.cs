@@ -20,11 +20,18 @@ namespace SyntaxTree
                 {
                     if (((Node)storedNodes.Peek()._item).type == NodeContentType.Operation) //If it is an operation, form a tree
                     {
-                        Node operation = (Node)storedNodes.Pop()._item;
-                        VariantNode? right = storedNodes.Pop();
-                        VariantNode? left = storedNodes.Pop();
-
-                        storedNodes.Push(new VariantNode(new Tree(operation,left,right))); //Push new tree item
+                        if (((Node)storedNodes.Peek()._item).contents != "!")
+                        {
+                            storedNodes.Push(new VariantNode(MakeTreeStack(ref storedNodes))); //Push new tree item
+                        }
+                        else
+                        {
+                            storedNodes.Push(new VariantNode(MakeNot(ref storedNodes))); //Make not operation
+                        }
+                    }
+                    else if(((Node)storedNodes.Peek()._item).type == NodeContentType.End) //If it is an end node, form a tree
+                    {
+                        storedNodes.Push(new VariantNode(MakeTreeStack(ref storedNodes))); //Push new tree item
                     }
                 }
                 else if (storedNodes.Peek()._item.GetType() == typeof(Tree)) //If Tree type 
@@ -35,6 +42,38 @@ namespace SyntaxTree
 
             Tree newTree = storedNodes.Pop().ToTree();
             return newTree;
+        }
+
+        private static Tree MakeTreeStack(ref Stack<VariantNode> nodeStack)
+        {
+            Node opNode = (Node)nodeStack.Pop()._item;
+            VariantNode? right = null;
+            VariantNode? left = null;
+
+            if (nodeStack.Count > 0) //Check for an empty stack
+            {
+                right = nodeStack.Pop();
+            }
+
+            if (nodeStack.Count > 0) //Check for an empty stack
+            {
+                left = nodeStack.Pop();
+            }
+
+            return new Tree(opNode, left, right);
+        }
+
+        private static Tree MakeNot(ref Stack<VariantNode> nodeStack)
+        {
+            Node opNode = (Node)nodeStack.Pop()._item;
+            VariantNode? left = null;
+
+            if (nodeStack.Count > 0) //Check for an empty stack
+            {
+                left = nodeStack.Pop();
+            }
+
+            return new Tree(opNode, left, null);
         }
     }
 }
