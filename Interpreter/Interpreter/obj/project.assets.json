@@ -8,28 +8,20 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "C:\\Users\\100505349\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Users\\redss\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "\\\\university.ds.derby.ac.uk\\dfs\\Student\\Home\\100505349\\Github\\LanguageDesign\\Interpreter\\Interpreter\\Interpreter.csproj",
+      "projectUniqueName": "C:\\Users\\redss\\Desktop\\GithubRepos\\LanguageDesign\\Interpreter\\Interpreter\\Interpreter.csproj",
       "projectName": "Interpreter",
-      "projectPath": "\\\\university.ds.derby.ac.uk\\dfs\\Student\\Home\\100505349\\Github\\LanguageDesign\\Interpreter\\Interpreter\\Interpreter.csproj",
-      "packagesPath": "C:\\Users\\100505349\\.nuget\\packages\\",
-      "outputPath": "\\\\university.ds.derby.ac.uk\\dfs\\Student\\Home\\100505349\\Github\\LanguageDesign\\Interpreter\\Interpreter\\obj\\",
+      "projectPath": "C:\\Users\\redss\\Desktop\\GithubRepos\\LanguageDesign\\Interpreter\\Interpreter\\Interpreter.csproj",
+      "packagesPath": "C:\\Users\\redss\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\redss\\Desktop\\GithubRepos\\LanguageDesign\\Interpreter\\Interpreter\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
-      ],
       "configFilePaths": [
-        "C:\\Users\\100505349\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\redss\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
@@ -68,7 +60,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.401\\RuntimeIdentifierGraph.json"
       }
     }
   }

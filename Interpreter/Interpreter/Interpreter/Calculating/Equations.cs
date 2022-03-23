@@ -9,7 +9,7 @@ namespace Calculating
 {
     class Equations
     {
-        public static Node ProcessQueue(ref Queue<Node> nodeQueue) //Processes the result of a postfix/prefix queue
+        public static Node ProcessQueue(Queue<Node> nodeQueue) //Processes the result of a postfix/prefix queue
         {
             try
             {

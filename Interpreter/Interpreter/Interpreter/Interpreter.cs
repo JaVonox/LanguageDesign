@@ -5,6 +5,7 @@ using Tokens;
 using Parsing;
 using Calculating;
 using Nodes;
+using SyntaxTree;
 
 namespace Interpreter
 { 
@@ -64,10 +65,14 @@ namespace Interpreter
                         {
                             Console.Write(outNode.type + ":" + outNode.contents + " ");
                         }
-                        Console.WriteLine("");
 
-                        Node resultToken = Calculating.Equations.ProcessQueue(ref output);
-                        Console.WriteLine(resultToken.type + ":" + resultToken.contents); //Return string form of operation result
+                        Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output);
+
+                        Console.WriteLine(" -> " + syntaxTree.PrintTreeContents());
+
+                        Node resultSyn = syntaxTree.CalculateTreeResult(); //Evaluate conditions of tree
+                        Console.WriteLine(resultSyn.type + ":" + resultSyn.contents);
+                        Console.WriteLine("\n");
                     }
 
                 }
