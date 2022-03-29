@@ -20,7 +20,7 @@ namespace SyntaxTree
                 {
                     if (((Node)storedNodes.Peek()._item).type == NodeContentType.Operation) //If it is an operation, form a tree
                     {
-                        if (((Node)storedNodes.Peek()._item).contents != "!")
+                        if (((Node)storedNodes.Peek()._item).contents.GetStringContents() != "!")
                         {
                             storedNodes.Push(new VariantNode(MakeTreeStack(ref storedNodes))); //Push new tree item
                         }

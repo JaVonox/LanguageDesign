@@ -39,11 +39,11 @@ namespace Parsing
                 }
                 else
                 {
-                    if (t.type == NodeContentType.Operation && (opToPriority.ContainsKey(t.contents))) //Check for operations
+                    if (t.type == NodeContentType.Operation && (opToPriority.ContainsKey(t.contents.GetStringContents()))) //Check for operations
                     {
-                        if (opStack.Count > 0 && opToPriority[opStack.Peek().contents] <= opToPriority[t.contents]) //If lower priority than the current top item
+                        if (opStack.Count > 0 && opToPriority[opStack.Peek().contents.GetStringContents()] <= opToPriority[t.contents.GetStringContents()]) //If lower priority than the current top item
                         {
-                            while (opStack.Count > 0 && opStack.Peek().type != NodeContentType.Bracket && opToPriority[opStack.Peek().contents] <= opToPriority[t.contents])
+                            while (opStack.Count > 0 && opStack.Peek().type != NodeContentType.Bracket && opToPriority[opStack.Peek().contents.GetStringContents()] <= opToPriority[t.contents.GetStringContents()])
                             {
                                 tQueue.Enqueue(opStack.Pop());
                             }
@@ -52,15 +52,15 @@ namespace Parsing
                     }
                     else if(t.type == NodeContentType.Bracket) //Check for brackets
                     {
-                        if (t.contents == "(")
+                        if (t.contents.GetStringContents() == "(")
                         {
                             opStack.Push(t);
                         }
-                        else if (t.contents == ")")
+                        else if (t.contents.GetStringContents() == ")")
                         {
                             while (opStack.Count > 0)
                             {
-                                if (opStack.Peek().type == NodeContentType.Bracket && opStack.Peek().contents == "(") //Iterate through until finding a left bracket
+                                if (opStack.Peek().type == NodeContentType.Bracket && opStack.Peek().contents.GetStringContents() == "(") //Iterate through until finding a left bracket
                                 {
                                     opStack.Pop();
                                     break;

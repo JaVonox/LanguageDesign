@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Tokens;
 using Parsing;
-using Calculating;
 using Nodes;
 using SyntaxTree;
 
@@ -12,11 +11,12 @@ namespace Interpreter
     class Interpreter
     {
         private List<List<Token>> commands = new List<List<Token>>(); //Commands -> set of tokens
-        private LoadedVariables vars = new LoadedVariables();
         public Interpreter(string input)
         {
             try
             {
+                Item a = new Item(NodeContentType.Integer, "1");
+
                 List<Token> tokens = new List<Token>();
                 TokenHandler.CreateTokens(input, ref tokens);
 
@@ -64,7 +64,7 @@ namespace Interpreter
 
                         if (resultSyn != null)
                         {
-                            Console.WriteLine(resultSyn.type + ":" + resultSyn.contents);
+                            Console.WriteLine(resultSyn.type + ":" + resultSyn.contents.ReturnValue());
                         }
                         else
                         {

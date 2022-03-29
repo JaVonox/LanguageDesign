@@ -33,39 +33,69 @@ namespace Nodes
             return content.GetType();
         }
 
-        public Item(Node item)
+        public string GetStringContents()
         {
-            Setter(item.type, item.contents);
+            return ReturnValue().ToString();
         }
-        public Item(NodeContentType type, object contents)
+        //Constructors
+        public Item(Token item)
         {
-            Setter(type,contents);
+            Setter((NodeContentType)item.type, item.contents);
         }
-        private void Setter(NodeContentType type, object contents)
+        public Item(NodeContentType type, object inContents)
+        {
+            Setter(type, inContents);
+        }
+        private void Setter(NodeContentType type, object inContents)
         {
             switch (type)
             {
                 case NodeContentType.Integer:
                     {
                         content = new TypeTemplate.Integer();
-                        content.contents = contents;
+                        content.contents = inContents;
                         break;
                     }
                 case NodeContentType.Decimal:
                     {
                         content = new TypeTemplate.Decimal();
-                        content.contents = contents;
+                        content.contents = inContents;
                         break;
                     }
                 case NodeContentType.String:
                     {
                         content = new TypeTemplate.String();
-                        content.contents = contents;
+                        content.contents = inContents;
+                        break;
+                    }
+                case NodeContentType.Boolean:
+                    {
+                        content = new TypeTemplate.Boolean();
+                        content.contents = inContents;
+                        break;
+                    }
+                case NodeContentType.Operation:
+                    {
+                        content = new TypeTemplate.Operation();
+                        content.contents = inContents;
+                        break;
+                    }
+                case NodeContentType.End:
+                    {
+                        content = new TypeTemplate.End();
+                        content.contents = inContents;
                         break;
                     }
                 default:
-                    throw new Exception("Unimplemented type");
+                    throw new Exception("Unimplemented type: " + type + ":" + inContents);
             }
+        }
+
+        //Equations
+
+        public static Item operator +(Item self, Item ext)
+        {
+            return self.content.AddOperation(self, ext);
         }
     }
     public abstract class TypeTemplate //Matching unit object
@@ -77,12 +107,31 @@ namespace Nodes
             get;
             set;
         }
+
+        public abstract Item AddOperation(Item self, Item ext);
         public sealed class Integer : TypeTemplate
         {
             public override object contents
             {
                 get { return Convert.ToInt32(_interiorContents); }
                 set { _interiorContents = value; }
+            }
+
+            public override Item AddOperation(Item self, Item ext)
+            {
+                switch (ext.GetType().Name)
+                {
+                    case "Integer":
+                        {
+                            return new Item(NodeContentType.Integer, self.ReturnValue() + ext.ReturnValue());
+                        }
+                    case "Decimal":
+                        {
+                            return new Item(NodeContentType.Decimal, self.ReturnValue() + ext.ReturnValue());
+                        }
+                    default:
+                        throw new Exception("Unsupported interaction");
+                }
             }
 
         }
@@ -93,7 +142,10 @@ namespace Nodes
                 get { return Convert.ToDecimal(_interiorContents); }
                 set { _interiorContents = value; }
             }
-        }
+
+            public override Item AddOperation(Item self, Item ext) { return null; }
+
+            }
         public sealed class String : TypeTemplate
         {
             public override object contents
@@ -101,6 +153,36 @@ namespace Nodes
                 get { return _interiorContents.ToString(); }
                 set { _interiorContents = value; }
             }
+
+            public override Item AddOperation(Item self, Item ext) { return null; }
+        }
+        public sealed class Operation : TypeTemplate
+        {
+            public override object contents
+            {
+                get { return _interiorContents.ToString(); }
+                set { _interiorContents = value; }
+            }
+
+            public override Item AddOperation(Item self, Item ext) { return null; }
+        }
+        public sealed class Boolean : TypeTemplate
+        {
+            public override object contents
+            {
+                get { return (bool)_interiorContents; }
+                set { _interiorContents = value; }
+            }
+            public override Item AddOperation(Item self, Item ext) { return null; }
+        }
+        public sealed class End : TypeTemplate
+        {
+            public override object contents
+            {
+                get { return _interiorContents.ToString(); }
+                set { _interiorContents = value; }
+            }
+            public override Item AddOperation(Item self, Item ext) { return null; }
         }
     }
     public class LoadedVariables //Variables
@@ -134,38 +216,32 @@ namespace Nodes
         };
 
         public NodeContentType type;
-        public string contents;
+        public Item contents;
         public Func<Node, Node, Node, Node?> itemMethod;
         public Node(Token parentToken)
         {
-            contents = parentToken.contents;
+            contents = new Item(parentToken);
             type = (NodeContentType)parentToken.type;
-            IdentifierChecking();
+            AppendOperations();
+        }
+        public Node(NodeContentType typ, Item newItem)
+        {
+            contents = newItem;
+            type = typ;
+
             AppendOperations();
         }
         public Node(NodeContentType typ, string cont)
         {
             type = typ;
-            contents = cont;
-            IdentifierChecking();
+            contents = new Item(typ,cont);
             AppendOperations();
         }
         public Node(Node inheritNode)
         {
             type = inheritNode.type;
             contents = inheritNode.contents;
-            IdentifierChecking();
             AppendOperations();
-        }
-        private void IdentifierChecking() //Check if the identifier item is a keyword, and reassign appropriately
-        {
-            if(type == NodeContentType.Identifier)
-            {
-                if(keywords.ContainsKey(contents))
-                {
-                    type = NodeContentType.Keyword;
-                }
-            }
         }
         public void AppendOperations() //Append the token methods as appropriate
         {
@@ -212,7 +288,7 @@ namespace Nodes
         public string PrintTreeContents()
         {
             string corrString = "(";
-            corrString += myNode.contents;
+            corrString += myNode.contents.ReturnValue();
 
             if (leftNode != null)
             {
@@ -222,7 +298,7 @@ namespace Nodes
                 }
                 else
                 {
-                    corrString += ((Node)leftNode._item).contents;
+                    corrString += ((Node)leftNode._item).contents.ReturnValue();
                 }
             }
             else
@@ -238,7 +314,7 @@ namespace Nodes
                 }
                 else
                 {
-                    corrString += ((Node)rightNode._item).contents;
+                    corrString += ((Node)rightNode._item).contents.ReturnValue();
                 }
             }
             else
