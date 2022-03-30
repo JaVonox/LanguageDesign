@@ -2,162 +2,78 @@
 using System.Collections.Generic;
 using System.Text;
 using Nodes;
+using TypeDef;
 
 namespace NodeOperations
 {
-    public static class OperatorDefinitions //Methods for token creation
+    public static class OperatorInteractions
     {
-
-        //TODO
-        //THIS SHOULD ALL BE DEPRICIATED. IT SHOULD BE REPLACED BY THE ITEMS OPERATIONS. FOR NOW MOST OF THE STUFF WONT WORK>
-        public static Node? IntegerMethods(Node lNode, Node rNode, Node opNode)
+        public static Node? Interact(Node lNode, Node rNode, Node opNode)
         {
+            Item producedItem;
+
             switch (opNode.contents.ReturnValue())
             {
                 case "+":
-                    {
-                        return new Node(NodeContentType.Integer, lNode.contents + rNode.contents); //TODO this may not always return integer. Gotta rework this
-                    }
-                case NodeContentType.Decimal:
-                    {
-                        if (opNode.contents.ReturnValue() == "+") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) + Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "-") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) - Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "*") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) * Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "/") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) / Convert.ToDecimal(rNode.contents)).ToString()); }
-
-                        else if (opNode.contents.ReturnValue() == "<") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) < Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == ">") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) > Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "<=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) <= Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == ">=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) >= Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "==") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else { throw new Exception("Invalid operation attempted"); }
-                    }
-                case NodeContentType.String:
-                    {
-                        return StringMethods(lNode, rNode, opNode);
-                    }
+                    producedItem = lNode.contents + rNode.contents;
+                    break;
+                case "-":
+                    producedItem = lNode.contents - rNode.contents;
+                    break;
+                case "*":
+                    producedItem = lNode.contents * rNode.contents;
+                    break;
+                case "/":
+                    producedItem = lNode.contents / rNode.contents;
+                    break;
+                case "<":
+                    producedItem = Item.LessThan(lNode.contents, rNode.contents);
+                    break;
+                case ">":
+                    producedItem = Item.GreaterThan(lNode.contents, rNode.contents);
+                    break;
+                case "==":
+                    producedItem = Item.EqualTo(lNode.contents, rNode.contents);
+                    break;
+                case "!=":
+                    producedItem = Item.NotEqualTo(lNode.contents, rNode.contents);
+                    break;
+                case "<=":
+                    producedItem = Item.LessThanEqualTo(lNode.contents, rNode.contents);
+                    break;
+                case ">=":
+                    producedItem = Item.GreaterThanEqualTo(lNode.contents, rNode.contents);
+                    break;
+                case "&&":
+                    producedItem = Item.And(lNode.contents, rNode.contents);
+                    break;
+                case "||":
+                    producedItem = Item.Or(lNode.contents, rNode.contents);
+                    break;
+                case "!":
+                    producedItem = Item.Not(lNode.contents);
+                    break;
                 default:
-                    throw new Exception("Invalid operation attempted");
+                    throw new Exception("Unimplemented Operation");
             }
+
+            return new Node(GetTyping(producedItem), producedItem);
         }
 
-        public static Node? DecimalMethods(Node lNode, Node rNode, Node opNode)
+        public static Dictionary<Type, NodeContentType> contentRef = new Dictionary<Type, NodeContentType>() //Convert type to node content type
         {
-            switch (rNode.type)
-            {
-                case NodeContentType.Integer:
-                    {
-                        if (opNode.contents.ReturnValue() == "+") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) + Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "-") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) - Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "*") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) * Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "/") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) / Convert.ToDecimal(rNode.contents)).ToString()); }
+            {typeof(TypeTemplate.Integer), NodeContentType.Integer},
+            {typeof(TypeTemplate.Decimal), NodeContentType.Decimal },
+            {typeof(TypeTemplate.String), NodeContentType.String },
+            {typeof(TypeTemplate.Boolean), NodeContentType.Boolean },
+            {typeof(TypeTemplate.Operation), NodeContentType.Operation },
+            {typeof(TypeTemplate.End), NodeContentType.End },
+            {typeof(TypeTemplate.Bracket), NodeContentType.Bracket },
+        };
 
-                        else if (opNode.contents.ReturnValue() == "<") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) < Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == ">") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) > Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "<=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) <= Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == ">=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) >= Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "==") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) != Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else { throw new Exception("Invalid operation attempted"); }
-                    }
-                case NodeContentType.Decimal:
-                    {
-                        if (opNode.contents.ReturnValue() == "+") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) + Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "-") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) - Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "*") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) * Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "/") { return new Node(NodeContentType.Decimal, (Convert.ToDecimal(lNode.contents) / Convert.ToDecimal(rNode.contents)).ToString()); }
-
-                        else if (opNode.contents.ReturnValue() == "<") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) < Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == ">") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) > Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "<=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) <= Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == ">=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) >= Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "==") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) == Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else if (opNode.contents.ReturnValue() == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToDecimal(lNode.contents) != Convert.ToDecimal(rNode.contents)).ToString()); }
-                        else { throw new Exception("Invalid operation attempted"); }
-                    }
-                case NodeContentType.String:
-                    {
-                        return StringMethods(lNode, rNode, opNode);
-                    }
-                default:
-                    throw new Exception("Invalid operation attempted");
-            }
-
-        }
-
-        public static Node? BooleanMethods(Node lNode, Node rNode, Node opNode)
+        public static NodeContentType GetTyping(Item input)
         {
-            if (opNode.contents.ReturnValue() == "!") //Special operation
-            {
-                if (lNode != null && rNode != null) { throw new Exception("Invalid parameters in not clause"); }
-                else if (lNode != null)
-                {
-                    return NotOperator(lNode, opNode);
-                }
-                else if (rNode != null)
-                {
-                    return NotOperator(rNode, opNode);
-                }
-                else
-                {
-                    throw new Exception("Invalid operation attempted");
-                }
-            }
-            else
-            {
-                switch (rNode.type)
-                {
-                    case NodeContentType.Boolean:
-                        {
-                            if (opNode.contents.ReturnValue() == "&&") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) && Convert.ToBoolean(rNode.contents)).ToString()); }
-                            else if (opNode.contents.ReturnValue() == "||") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) || Convert.ToBoolean(rNode.contents)).ToString()); }
-                            else if (opNode.contents.ReturnValue() == "==") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) == Convert.ToBoolean(rNode.contents)).ToString()); }
-                            else if (opNode.contents.ReturnValue() == "!=") { return new Node(NodeContentType.Boolean, (Convert.ToBoolean(lNode.contents) != Convert.ToBoolean(rNode.contents)).ToString()); }
-                            else { throw new Exception("Invalid operation attempted"); }
-                        }
-                    default:
-                        throw new Exception("Invalid operation attempted");
-                }
-            }
-
-        }
-
-        public static Node? NotOperator(Node rNode, Node opNode) //This is a special command reserved for reversing a single bool
-        {
-            switch (rNode.type)
-            {
-                case NodeContentType.Boolean:
-                    {
-                        if (opNode.contents.ReturnValue() == "!") { return new Node(NodeContentType.Boolean, (!Convert.ToBoolean(rNode.contents)).ToString()); }
-                        else { throw new Exception("Invalid operation attempted"); }
-                    }
-                default:
-                    throw new Exception("Invalid operation attempted");
-            }
-        }
-
-        public static Node? StringMethods(Node lNode, Node rNode, Node opNode)
-        {
-            if (opNode.contents.ReturnValue() == "+")
-            {
-                return new Node(NodeContentType.String, lNode.contents.GetStringContents() + rNode.contents.GetStringContents());
-            }
-            else
-            {
-                switch (rNode.type)
-                {
-                    case NodeContentType.String:
-                        {
-                            if (opNode.contents.ReturnValue() == "==") { return new Node(NodeContentType.Boolean, (lNode.contents == rNode.contents).ToString()); }
-                            if (opNode.contents.ReturnValue() == "!=") { return new Node(NodeContentType.Boolean, (lNode.contents != rNode.contents).ToString()); }
-                            else { throw new Exception("Invalid operation attempted"); }
-                        }
-                    default:
-                        throw new Exception("Invalid operation attempted");
-                }
-
-            }
+            return contentRef[input.GetType()];
         }
     }
 }

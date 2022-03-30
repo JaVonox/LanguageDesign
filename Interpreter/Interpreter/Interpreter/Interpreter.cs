@@ -5,6 +5,7 @@ using Tokens;
 using Parsing;
 using Nodes;
 using SyntaxTree;
+using TypeDef;
 
 namespace Interpreter
 { 

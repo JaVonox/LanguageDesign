@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interpreter\Calculating\**" />
+    <EmbeddedResource Remove="Interpreter\Calculating\**" />
+    <None Remove="Interpreter\Calculating\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -25,10 +31,6 @@
     <None Update="CodeFile.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interpreter\Calculating\" />
   </ItemGroup>
 
 </Project>
