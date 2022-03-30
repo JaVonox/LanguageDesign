@@ -32,6 +32,8 @@ namespace Parsing
             Queue<Node> tQueue = new Queue<Node>(); //Node queue
             Stack<Node> opStack = new Stack<Node>(); //operationStack
 
+            //TODO the ordering of functions and the presence of the = operator needs to be considered. It may be that they need to be removed from this entirely and use a different system
+
             foreach(Node t in nodeSeq) //Iterate through existing sequence of tokens
             {
                 if(t.type != NodeContentType.Operation && t.type != NodeContentType.Bracket)
