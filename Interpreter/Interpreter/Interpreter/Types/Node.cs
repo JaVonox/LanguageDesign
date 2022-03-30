@@ -39,7 +39,8 @@ namespace Nodes
         }
         public Item AddNewItem(string name, Item contents) //Add new variable and return the newly created variable ref
         {
-            variables.Add(name, contents);
+            Item newItem = new Item(Node.contentRef[contents.GetType()], contents.ReturnValue());
+            variables.Add(name, newItem);
             return variables[name];
         }
     }

@@ -16,3 +16,8 @@ print "10 corgis" != "10" + "corgis";
 quickMaths = 9 + 10;
 quickMaths = quickMaths + 2;
 print quickMaths;
+bb = quickMaths;
+print bb;
+quickMaths = quickMaths + 1;
+print bb;
+print quickMaths;
