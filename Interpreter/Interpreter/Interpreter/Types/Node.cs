@@ -4,6 +4,7 @@ using System.Text;
 using Tokens;
 using NodeOperations;
 using TypeDef;
+using Interpreter; //For loading global variables
 
 namespace Nodes
 {
@@ -19,9 +20,23 @@ namespace Nodes
         Bracket,
         Boolean,
     }
+
     public class LoadedVariables //Variables
     {
-        public static Dictionary<string, Node> variables = new Dictionary<string, Node>() { };
+        public static Dictionary<string, Item> variables = new Dictionary<string, Item>() { { "a", new Item(NodeContentType.Integer, 1) } };
+        public bool Contains(string name)
+        {
+            return variables.ContainsKey(name);
+        }
+
+        public Item GetItem(string name)
+        {
+            return variables[name];
+        }
+        public void UpdateItem(string name, object contents)
+        {
+            variables[name] = new Item(Node.contentRef[variables[name].GetType()], contents);
+        }
     }
 
     public class VariantNode
@@ -44,6 +59,17 @@ namespace Nodes
     }
     public class Node
     {
+        public static Dictionary<Type, NodeContentType> contentRef = new Dictionary<Type, NodeContentType>() //Convert type to node content type
+        {
+            {typeof(TypeTemplate.Integer), NodeContentType.Integer},
+            {typeof(TypeTemplate.Decimal), NodeContentType.Decimal },
+            {typeof(TypeTemplate.String), NodeContentType.String },
+            {typeof(TypeTemplate.Boolean), NodeContentType.Boolean },
+            {typeof(TypeTemplate.Operation), NodeContentType.Operation },
+            {typeof(TypeTemplate.End), NodeContentType.End },
+            {typeof(TypeTemplate.Bracket), NodeContentType.Bracket },
+        };
+
         public static Dictionary<string, object> keywords = new Dictionary<string, object>() //Keywords and their referenced things
         {
             {"if",null},
@@ -53,8 +79,11 @@ namespace Nodes
         public Item contents;
         public Node(Token parentToken)
         {
-            contents = new Item(parentToken);
-            type = (NodeContentType)parentToken.type;
+            if(!GetVariable(parentToken.contents,(NodeContentType)parentToken.type))
+            {
+                contents = new Item(parentToken);
+                type = (NodeContentType)parentToken.type;
+            }
         }
         public Node(NodeContentType typ, Item newItem)
         {
@@ -63,13 +92,30 @@ namespace Nodes
         }
         public Node(NodeContentType typ, string cont)
         {
-            type = typ;
-            contents = new Item(typ,cont);
+            if (!GetVariable(cont.ToString(),typ))
+            {
+                type = typ;
+                contents = new Item(typ, cont);
+            }
         }
         public Node(Node inheritNode)
         {
             type = inheritNode.type;
             contents = inheritNode.contents;
+        }
+
+        public bool GetVariable(string name, NodeContentType typing)
+        {
+            if(typing == NodeContentType.Identifier) //Check if variable
+            {
+                if(Interpreter.Interpreter.globalVars.Contains(name))
+                {
+                    contents = Interpreter.Interpreter.globalVars.GetItem(name);
+                    type = contentRef[contents.GetType()];
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

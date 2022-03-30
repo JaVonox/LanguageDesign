@@ -12,6 +12,7 @@ namespace Interpreter
     class Interpreter
     {
         private List<List<Token>> commands = new List<List<Token>>(); //Commands -> set of tokens
+        public static LoadedVariables globalVars = new LoadedVariables(); //Global variables
         public Interpreter(string input)
         {
             try

@@ -60,20 +60,9 @@ namespace NodeOperations
             return new Node(GetTyping(producedItem), producedItem);
         }
 
-        public static Dictionary<Type, NodeContentType> contentRef = new Dictionary<Type, NodeContentType>() //Convert type to node content type
-        {
-            {typeof(TypeTemplate.Integer), NodeContentType.Integer},
-            {typeof(TypeTemplate.Decimal), NodeContentType.Decimal },
-            {typeof(TypeTemplate.String), NodeContentType.String },
-            {typeof(TypeTemplate.Boolean), NodeContentType.Boolean },
-            {typeof(TypeTemplate.Operation), NodeContentType.Operation },
-            {typeof(TypeTemplate.End), NodeContentType.End },
-            {typeof(TypeTemplate.Bracket), NodeContentType.Bracket },
-        };
-
         public static NodeContentType GetTyping(Item input)
         {
-            return contentRef[input.GetType()];
+            return Node.contentRef[input.GetType()];
         }
     }
 }
