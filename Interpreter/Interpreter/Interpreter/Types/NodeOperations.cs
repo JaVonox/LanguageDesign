@@ -53,6 +53,9 @@ namespace NodeOperations
                 case "!":
                     producedItem = Item.Not(lNode.contents);
                     break;
+                case "=":
+                    Item.SetContent(lNode.contents, rNode.contents);
+                    return lNode; //Return the lNode with updated data
                 default:
                     throw new Exception("Unimplemented Operation");
             }

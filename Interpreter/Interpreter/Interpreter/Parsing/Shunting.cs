@@ -25,6 +25,7 @@ namespace Parsing
             {"!=",5 },
             {"&&",6 },
             {"||",7 },
+            {"=",8 },
         };
         public static Queue<Node> ShuntingYardAlgorithm(List<Node> tokenSequence)
         {

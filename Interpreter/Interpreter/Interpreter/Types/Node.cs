@@ -73,6 +73,7 @@ namespace Nodes
         public static Dictionary<string, object> keywords = new Dictionary<string, object>() //Keywords and their referenced things
         {
             {"if",null},
+            {"int",null},
         };
 
         public NodeContentType type;

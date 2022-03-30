@@ -144,6 +144,10 @@ namespace TypeDef
         {
             return self.content.Not(self);
         }
+        public static void SetContent(Item self, Item newContents)
+        {
+            self.content.SetItem(newContents);
+        }
     }
     public abstract class TypeTemplate //Matching unit object
     {
@@ -156,6 +160,11 @@ namespace TypeDef
         }
 
         //Operation definitions
+
+        public void SetItem(Item newItem)
+        {
+            contents = newItem.ReturnValue(); //Set the value. TODO add type checking
+        }
         public abstract Item AddOperation(Item self, Item ext);
         public abstract Item SubOperation(Item self, Item ext);
         public abstract Item MultOperation(Item self, Item ext);
@@ -181,7 +190,6 @@ namespace TypeDef
                 get { return Convert.ToInt32(_interiorContents); }
                 set { _interiorContents = value; }
             }
-
             public override Item AddOperation(Item self, Item ext)
             {
                 switch (ext.GetType().Name)
