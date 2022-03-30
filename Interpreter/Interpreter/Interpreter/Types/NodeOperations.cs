@@ -64,9 +64,13 @@ namespace NodeOperations
                                 lNode.contents = Interpreter.Interpreter.globalVars.AddNewItem(lNode.contents.ReturnValue(), rNode.contents); //Make new variable with value equal to that of rNode
                             }
                         }
-                        else
+                        else if(Interpreter.Interpreter.globalVars.Contains(lNode.contents))
                         {
                             Item.SetContent(lNode.contents, rNode.contents);
+                        }
+                        else
+                        {
+                            throw new Exception("Could not assign to non-variable item");
                         }
                         return lNode; //Return the lNode with updated data
                     default:

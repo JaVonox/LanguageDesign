@@ -5,6 +5,7 @@ using Tokens;
 using NodeOperations;
 using TypeDef;
 using Interpreter; //For loading global variables
+using System.Linq;
 
 namespace Nodes
 {
@@ -29,6 +30,11 @@ namespace Nodes
             return variables.ContainsKey(name);
         }
 
+        public bool Contains(Item item)
+        {
+            return variables.Values.Contains(item);
+        }
+
         public Item GetItem(string name)
         {
             return variables[name];
@@ -39,6 +45,7 @@ namespace Nodes
         }
         public Item AddNewItem(string name, Item contents) //Add new variable and return the newly created variable ref
         {
+            if (Node.IsKeyword(name)) { throw new Exception("Invalid variable name"); }
             Item newItem = new Item(Node.contentRef[contents.GetType()], contents.ReturnValue());
             variables.Add(name, newItem);
             return variables[name];
@@ -115,10 +122,15 @@ namespace Nodes
         }
         public void CheckKeyword()
         {
-            if(type == NodeContentType.Identifier && keywords.Contains(contents.ReturnValue()))
+            if(type == NodeContentType.Identifier && IsKeyword(contents.ReturnValue()))
             {
                 type = NodeContentType.Keyword;
             }
+        }
+
+        public static bool IsKeyword(string item)
+        {
+            return keywords.Contains(item);
         }
         public bool GetVariable(string name, NodeContentType typing)
         {
