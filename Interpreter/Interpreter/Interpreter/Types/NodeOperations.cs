@@ -12,52 +12,83 @@ namespace NodeOperations
         {
             Item producedItem;
 
-            switch (opNode.contents.ReturnValue())
+            if (opNode.type == NodeContentType.Operation)
             {
-                case "+":
-                    producedItem = lNode.contents + rNode.contents;
-                    break;
-                case "-":
-                    producedItem = lNode.contents - rNode.contents;
-                    break;
-                case "*":
-                    producedItem = lNode.contents * rNode.contents;
-                    break;
-                case "/":
-                    producedItem = lNode.contents / rNode.contents;
-                    break;
-                case "<":
-                    producedItem = Item.LessThan(lNode.contents, rNode.contents);
-                    break;
-                case ">":
-                    producedItem = Item.GreaterThan(lNode.contents, rNode.contents);
-                    break;
-                case "==":
-                    producedItem = Item.EqualTo(lNode.contents, rNode.contents);
-                    break;
-                case "!=":
-                    producedItem = Item.NotEqualTo(lNode.contents, rNode.contents);
-                    break;
-                case "<=":
-                    producedItem = Item.LessThanEqualTo(lNode.contents, rNode.contents);
-                    break;
-                case ">=":
-                    producedItem = Item.GreaterThanEqualTo(lNode.contents, rNode.contents);
-                    break;
-                case "&&":
-                    producedItem = Item.And(lNode.contents, rNode.contents);
-                    break;
-                case "||":
-                    producedItem = Item.Or(lNode.contents, rNode.contents);
-                    break;
-                case "!":
-                    producedItem = Item.Not(lNode.contents);
-                    break;
-                case "=":
-                    Item.SetContent(lNode.contents, rNode.contents);
-                    return lNode; //Return the lNode with updated data
-                default:
-                    throw new Exception("Unimplemented Operation");
+                switch (opNode.contents.ReturnValue())
+                {
+                    case "+":
+                        producedItem = lNode.contents + rNode.contents;
+                        break;
+                    case "-":
+                        producedItem = lNode.contents - rNode.contents;
+                        break;
+                    case "*":
+                        producedItem = lNode.contents * rNode.contents;
+                        break;
+                    case "/":
+                        producedItem = lNode.contents / rNode.contents;
+                        break;
+                    case "<":
+                        producedItem = Item.LessThan(lNode.contents, rNode.contents);
+                        break;
+                    case ">":
+                        producedItem = Item.GreaterThan(lNode.contents, rNode.contents);
+                        break;
+                    case "==":
+                        producedItem = Item.EqualTo(lNode.contents, rNode.contents);
+                        break;
+                    case "!=":
+                        producedItem = Item.NotEqualTo(lNode.contents, rNode.contents);
+                        break;
+                    case "<=":
+                        producedItem = Item.LessThanEqualTo(lNode.contents, rNode.contents);
+                        break;
+                    case ">=":
+                        producedItem = Item.GreaterThanEqualTo(lNode.contents, rNode.contents);
+                        break;
+                    case "&&":
+                        producedItem = Item.And(lNode.contents, rNode.contents);
+                        break;
+                    case "||":
+                        producedItem = Item.Or(lNode.contents, rNode.contents);
+                        break;
+                    case "!":
+                        producedItem = Item.Not(lNode.contents);
+                        break;
+                    case "=":
+                        if (lNode.type == NodeContentType.Identifier) //If undefined variable - contents stores name
+                        {
+                            if (Interpreter.Interpreter.globalVars.Contains(lNode.contents.ReturnValue().ToString())) { throw new Exception("Variable redefinition"); }
+                            else
+                            {
+                                lNode.contents = Interpreter.Interpreter.globalVars.AddNewItem(lNode.contents.ReturnValue(), rNode.contents); //Make new variable with value equal to that of rNode
+                            }
+                        }
+                        else
+                        {
+                            Item.SetContent(lNode.contents, rNode.contents);
+                        }
+                        return lNode; //Return the lNode with updated data
+                    default:
+                        throw new Exception("Unimplemented Operation");
+                }
+            }
+            else if (opNode.type == NodeContentType.Keyword)
+            {
+                switch (opNode.contents.ReturnValue())
+                {
+                    case "print":
+                        {
+                            Console.WriteLine(lNode.contents.ReturnValue()); //print out the value of the left node
+                            return null;
+                        }
+                    default:
+                        throw new Exception("Unrecognised keyword");
+                }
+            }
+            else
+            {
+                throw new Exception("Invalid operation used on item");
             }
 
             return new Node(GetTyping(producedItem), producedItem);

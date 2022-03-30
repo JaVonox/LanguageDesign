@@ -60,19 +60,9 @@ namespace Interpreter
                         output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
                         Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output);
 
-                        Console.WriteLine(syntaxTree.PrintTreeContents()); //Print contents (SHOWS WITHOUT TYPE - MAYBE FIX?)
+                        //Console.WriteLine(syntaxTree.PrintTreeContents()); //Print contents (SHOWS WITHOUT TYPE - MAYBE FIX?)
 
                         Node? resultSyn = syntaxTree.CalculateTreeResult(); //Evaluate conditions of tree
-
-                        if (resultSyn != null)
-                        {
-                            Console.WriteLine(resultSyn.type + ":" + resultSyn.contents.ReturnValue());
-                        }
-                        else
-                        {
-                            Console.WriteLine("<NULL>");
-                        }
-                        Console.WriteLine("\n");
                     }
 
                 }

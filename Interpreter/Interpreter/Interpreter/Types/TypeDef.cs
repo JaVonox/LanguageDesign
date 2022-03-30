@@ -79,47 +79,68 @@ namespace TypeDef
                         content.contents = inContents;
                         break;
                     }
+                case NodeContentType.Identifier: //Runs when variable is not in global area. When assigned to 
+                    {
+                        content = new TypeTemplate.Identifier();
+                        content.contents = inContents; //contents is variable name
+                        break;
+                    }
                 default:
                     throw new Exception("Unimplemented type: " + type + ":" + inContents);
             }
         }
 
+        private static void IsInvalid(Item self, Item ext)
+        {
+            if(self.GetType() == typeof(TypeTemplate.Identifier) || ext.GetType() == typeof(TypeTemplate.Identifier)) { throw new Exception("Use of variable before assignment"); }
+        }
         //Equations
 
         public static Item operator +(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.AddOperation(self, ext);
         }
         public static Item operator -(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.SubOperation(self, ext);
         }
         public static Item operator *(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.MultOperation(self, ext);
         }
         public static Item operator /(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.DivOperation(self, ext);
         }
+
+        //Value checking
         public static Item LessThan(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.LessThan(self, ext);
         }
         public static Item GreaterThan(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.GreaterThan(self, ext);
         }
         public static Item EqualTo(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.EqualTo(self, ext);
         }
         public static Item NotEqualTo(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.NotEqualTo(self, ext);
         }
         public static Item LessThanEqualTo(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             Item lessOp = self.content.LessThan(self, ext);
             if (lessOp.ReturnValue()) { return lessOp; }
             Item equalOp = self.content.EqualTo(self, ext);
@@ -127,21 +148,27 @@ namespace TypeDef
         }
         public static Item GreaterThanEqualTo(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             Item gOp = self.content.GreaterThan(self, ext);
             if (gOp.ReturnValue()) { return gOp; }
             Item equalOp = self.content.EqualTo(self, ext);
             return equalOp;
         }
+
+        //Boolean
         public static Item And(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.And(self, ext);
         }
         public static Item Or(Item self, Item ext)
         {
+            IsInvalid(self, ext);
             return self.content.Or(self, ext);
         }
         public static Item Not(Item self)
         {
+            if (Nodes.Node.contentRef[self.GetType()] == NodeContentType.Identifier) { throw new Exception("Use of variable before assignment"); }
             return self.content.Not(self);
         }
         public static void SetContent(Item self, Item newContents)
@@ -578,6 +605,24 @@ namespace TypeDef
             public override object contents
             {
                 get { return _interiorContents.ToString(); }
+                set { _interiorContents = value; }
+            }
+            public override Item AddOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item SubOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item MultOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item DivOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item LessThan(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item GreaterThan(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item EqualTo(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item And(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item Or(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
+            public override Item Not(Item self) { throw new Exception("Unsupported interaction"); }
+        }
+        public sealed class Identifier : TypeTemplate //Typeless identifier - unassigned.
+        {
+            public override object contents
+            {
+                get { return _interiorContents.ToString(); } //Stores the variable name
                 set { _interiorContents = value; }
             }
             public override Item AddOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }

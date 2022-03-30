@@ -27,12 +27,12 @@ namespace Parsing
             {"||",7 },
             {"=",8 },
         };
-        public static Queue<Node> ShuntingYardAlgorithm(List<Node> tokenSequence)
+        public static Queue<Node> ShuntingYardAlgorithm(List<Node> nodeSeq)
         {
             Queue<Node> tQueue = new Queue<Node>(); //Node queue
             Stack<Node> opStack = new Stack<Node>(); //operationStack
 
-            foreach(Node t in tokenSequence) //Iterate through existing sequence of tokens
+            foreach(Node t in nodeSeq) //Iterate through existing sequence of tokens
             {
                 if(t.type != NodeContentType.Operation && t.type != NodeContentType.Bracket)
                 {

@@ -23,7 +23,7 @@ namespace Nodes
 
     public class LoadedVariables //Variables
     {
-        public static Dictionary<string, Item> variables = new Dictionary<string, Item>() { { "a", new Item(NodeContentType.Integer, 1) } };
+        public static Dictionary<string, Item> variables = new Dictionary<string, Item>() {};
         public bool Contains(string name)
         {
             return variables.ContainsKey(name);
@@ -33,9 +33,14 @@ namespace Nodes
         {
             return variables[name];
         }
-        public void UpdateItem(string name, object contents)
+        public void UpdateItem(string name, object contents) //Need to add type checking TODO
         {
             variables[name] = new Item(Node.contentRef[variables[name].GetType()], contents);
+        }
+        public Item AddNewItem(string name, Item contents) //Add new variable and return the newly created variable ref
+        {
+            variables.Add(name, contents);
+            return variables[name];
         }
     }
 
@@ -70,10 +75,11 @@ namespace Nodes
             {typeof(TypeTemplate.Bracket), NodeContentType.Bracket },
         };
 
-        public static Dictionary<string, object> keywords = new Dictionary<string, object>() //Keywords and their referenced things
+        public static List<string> keywords = new List<string>() //Keywords
         {
-            {"if",null},
-            {"int",null},
+            "if",
+            "int",
+            "print",
         };
 
         public NodeContentType type;
@@ -84,6 +90,7 @@ namespace Nodes
             {
                 contents = new Item(parentToken);
                 type = (NodeContentType)parentToken.type;
+                CheckKeyword();
             }
         }
         public Node(NodeContentType typ, Item newItem)
@@ -97,6 +104,7 @@ namespace Nodes
             {
                 type = typ;
                 contents = new Item(typ, cont);
+                CheckKeyword();
             }
         }
         public Node(Node inheritNode)
@@ -104,12 +112,18 @@ namespace Nodes
             type = inheritNode.type;
             contents = inheritNode.contents;
         }
-
+        public void CheckKeyword()
+        {
+            if(type == NodeContentType.Identifier && keywords.Contains(contents.ReturnValue()))
+            {
+                type = NodeContentType.Keyword;
+            }
+        }
         public bool GetVariable(string name, NodeContentType typing)
         {
             if(typing == NodeContentType.Identifier) //Check if variable
             {
-                if(Interpreter.Interpreter.globalVars.Contains(name))
+                if(Interpreter.Interpreter.globalVars.Contains(name) && !keywords.Contains(name))
                 {
                     contents = Interpreter.Interpreter.globalVars.GetItem(name);
                     type = contentRef[contents.GetType()];
@@ -216,13 +230,17 @@ namespace Nodes
                 {
                     return null;
                 }
+                else if(leftValue.type == NodeContentType.Keyword)
+                {
+                    return OperatorInteractions.Interact(rightValue, null, leftValue); //Process single argument keywords
+                }
                 else
                 {
                     throw new Exception("END NODE HAD MULTIPLE VALUES");
                     return null;
                 }
             }
-            else if(leftValue != null || rightValue != null)
+            else if(leftValue != null || rightValue != null) //Operator or keyword
             {
                 return OperatorInteractions.Interact(leftValue, rightValue, myNode); //Use operator to calculate result of the query
             }
