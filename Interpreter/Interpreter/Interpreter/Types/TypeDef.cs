@@ -92,7 +92,7 @@ namespace TypeDef
 
         private static void IsInvalid(Item self, Item ext)
         {
-            if(self.GetType() == typeof(TypeTemplate.Identifier) || ext.GetType() == typeof(TypeTemplate.Identifier)) { throw new Exception("Use of variable before assignment"); }
+            if(self.GetType() == typeof(TypeTemplate.Identifier) || ext.GetType() == typeof(TypeTemplate.Identifier)) { throw new Exception("Use of variable " + self.ReturnValue() +" before assignment"); }
         }
         //Equations
 
@@ -470,7 +470,7 @@ namespace TypeDef
         {
             public override object contents
             {
-                get { return _interiorContents.ToString(); }
+                get { return _interiorContents == null ? "" : _interiorContents.ToString(); }
                 set { _interiorContents = value; }
             }
 
@@ -512,7 +512,7 @@ namespace TypeDef
         {
             public override object contents
             {
-                get { return _interiorContents.ToString(); }
+                get { return _interiorContents == null ? "" : _interiorContents.ToString(); }
                 set { _interiorContents = value; }
             }
 
@@ -586,7 +586,7 @@ namespace TypeDef
         {
             public override object contents
             {
-                get { return _interiorContents.ToString(); }
+                get { return _interiorContents == null ? "" : _interiorContents.ToString(); }
                 set { _interiorContents = value; }
             }
             public override Item AddOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
@@ -604,7 +604,7 @@ namespace TypeDef
         {
             public override object contents
             {
-                get { return _interiorContents.ToString(); }
+                get { return _interiorContents == null ? "" : _interiorContents.ToString(); }
                 set { _interiorContents = value; }
             }
             public override Item AddOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }

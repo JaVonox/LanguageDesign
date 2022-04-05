@@ -11,11 +11,11 @@ namespace Keywords //File for keywords and built in functions/statements
     {
         public static Dictionary<string,(Action<Node[]> act, string delimStart, string delimEnd)> keywords = new Dictionary<string, (Action<Node[]> act, string delimStart, string delimEnd)>() //Keywords and their functions
         {
-            {"print",(PrintStatement,"(",")")},
-            {"int",(CreateInt," "," ")},
-            {"float",(CreateDecimal," "," ")},
-            {"string",(CreateString," "," ")},
-            {"bool",(CreateBool," "," ")},
+            {"print",(PrintStatement,"(",")")}, //print(expression)
+            {"int",(CreateInt," "," ")}, //int var
+            {"float",(CreateDecimal," "," ")}, //float var
+            {"string",(CreateString," "," ")}, //string var
+            {"bool",(CreateBool," "," ")}, //bool var
         };
         public static (List<Node> outItems, int count) SubsetStatement(string statementName, List<Node> items) //Returns the nodes within the statement parameters. item input is all nodes after the statement, unsorted.
         {
@@ -43,7 +43,7 @@ namespace Keywords //File for keywords and built in functions/statements
                         return (new List<Node>() { items[0] }, 1); //Gets next item in the command
                     }
                 default:
-                    throw new Exception("Unknown Statement");
+                    throw new Exception("Unknown Statement '" + statementName + "'");
             }
         }
 
@@ -80,7 +80,7 @@ namespace Keywords //File for keywords and built in functions/statements
 
             if (setCounter != 0 || !isFinish)
             {
-                throw new Exception("Invalid number of delimiting character : " + keywords[statementName].delimStart + " and " + keywords[statementName].delimEnd);
+                throw new Exception("No matching " + keywords[statementName].delimEnd + " for " + keywords[statementName].delimStart);
             }
             else
             {
@@ -114,10 +114,10 @@ namespace Keywords //File for keywords and built in functions/statements
 
         private static void CreateNewVar(Node newItem, NodeContentType type)
         {
-            if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable declaration or redeclaration of variable"); }
+            if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable declaration or redeclaration of variable " + newItem.contents.ReturnValue()); }
             if (Interpreter.Interpreter.globalVars.Contains(newItem.contents.ReturnValue()))
             {
-                throw new Exception("Redeclaration of variable");
+                throw new Exception("Redeclaration of variable " + newItem.contents.ReturnValue());
             }
             else
             {

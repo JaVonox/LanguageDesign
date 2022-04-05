@@ -14,12 +14,19 @@ namespace Interpreter
     //FINAL LINE DOESNT REQUIRE ; 
     //NOT HAVING ; AT LINE END PRODUCES STRANGE RESULTS
     //NEED A WAY TO DO LIKE INT A = 2;
+    //string variables currently accept assignment like foobar = 1, creating a variable with value "1". This may need fixing.
+    //Input cannot be a statement because it returns a value
+
+    //Whole program must become a single AST
+    //therefore trees should be able to have more than 2 nodes
+    //Do error messages between different types
     class Interpreter
     {
         private List<List<Token>> commands = new List<List<Token>>(); //Commands -> set of tokens
         public static LoadedVariables globalVars = new LoadedVariables(); //Global variables
         public Interpreter(string input)
         {
+            int curLine = -1;
             try
             {
                 List<Token> tokens = new List<Token>(); //Token set
@@ -54,6 +61,7 @@ namespace Interpreter
 
                     foreach (List<Token> tSet in commands) //Parse and compute
                     {
+                        curLine = commands.IndexOf(tSet) + 1;
                         List<Node> nodeSet = new List<Node>(); //Convert tokens for this command into nodes
                         foreach(Token t in tSet)
                         {
@@ -70,7 +78,7 @@ namespace Interpreter
             }
             catch(Exception ex)
             {
-                Console.WriteLine("An error occured: " + ex);
+                Console.WriteLine("An error occured on line " + curLine + " - " + ex.Message);
             }
         }
 
@@ -97,7 +105,7 @@ namespace Interpreter
 
             if(nodeSet.Count > 0)
             {
-                throw new Exception("Unexpected code outside statement"); //Maybe TODO? this checks for code outside an expression or statement.
+                throw new Exception("Code recognised outside of statement"); //Maybe TODO? this checks for code outside an expression or statement.
             }
 
             Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
