@@ -56,13 +56,9 @@ namespace NodeOperations
                         producedItem = Item.Not(lNode.contents);
                         break;
                     case "=":
-                        if (lNode.type == NodeContentType.Identifier) //If undefined variable - contents stores name
+                        if (lNode.type == NodeContentType.Identifier) //If undefined variable
                         {
-                            if (Interpreter.Interpreter.globalVars.Contains(lNode.contents.ReturnValue().ToString())) { throw new Exception("Variable redefinition"); }
-                            else
-                            {
-                                lNode.contents = Interpreter.Interpreter.globalVars.AddNewItem(lNode.contents.ReturnValue(), rNode.contents); //Make new variable with value equal to that of rNode
-                            }
+                            throw new Exception("Unknown variable"); 
                         }
                         else if(Interpreter.Interpreter.globalVars.Contains(lNode.contents))
                         {

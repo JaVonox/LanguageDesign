@@ -13,6 +13,7 @@ namespace Interpreter
     //KNOWN ISSUES
     //FINAL LINE DOESNT REQUIRE ; 
     //NOT HAVING ; AT LINE END PRODUCES STRANGE RESULTS
+    //NEED A WAY TO DO LIKE INT A = 2;
     class Interpreter
     {
         private List<List<Token>> commands = new List<List<Token>>(); //Commands -> set of tokens
@@ -100,7 +101,6 @@ namespace Interpreter
             }
 
             Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
-            Console.WriteLine(syntaxTree.PrintTreeContents());
 
             return syntaxTree;
         }

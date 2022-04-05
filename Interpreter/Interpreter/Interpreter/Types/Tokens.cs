@@ -46,6 +46,19 @@ namespace Tokens
 
             for (int i = 0; i < chars.Length; i++)
             {
+                if(chars[i] == '"' && inType != NodeContentType.String) { break; }
+                else if(chars[i] == '"' && inType == NodeContentType.String)//If string start, continue string until end.
+                {
+                    appendedSet += chars[i];
+                    for (int y = i+1; y < chars.Length; y++)
+                    {
+                        if (chars[y] == '"') { break; }
+                        appendedSet += chars[y];
+                    }
+                    validSet.Add(appendedSet);
+                    return validSet;
+                }
+
                 appendedSet += chars[i];
 
                 int conditionsMet = 0;
@@ -221,14 +234,20 @@ namespace Tokens
                             }
                         }
 
-                        if ((!newSet || i == data.Length - 1 || data[i + 1] == '(') && tokenIsActive)
+                        if ((!newSet || i == data.Length - 1 || data[i + 1] == '(' || data[i+1] == '\"') && tokenIsActive)
                         {
                             if (!newSet)
                             {
                                 tokens[curToken].contents += data[i];
                             }
 
-                            if (delimChar.Contains(data[i]) || i == data.Length - 1 || data[i + 1] == '(') //If found end character or reached end of text
+                            if(tokens[curToken].contents.Contains("\"") && data[i + 1] == '\"')
+                            {
+                                tokens[curToken].contents += data[i+1];
+                                i++;
+                            }
+
+                            if (delimChar.Contains(data[i]) || i == data.Length - 1 || data[i + 1] == '(' || data[i+1] == '\"') //If found end character,reached end of text, or found a delimiting character
                             {
                                 ValidateToken(ref tokens, ref curToken, ref tokenIsActive, ref delimChar, ref endChars);
                             }
@@ -307,7 +326,9 @@ namespace Tokens
                 Token tmp = tokens[curToken];
                 List<string> tokenConts = new List<string> { tmp.contents };
                 condRefs.First(x => x.inType == tmp.type).ApplyFinalConds(ref tokenConts);
-                if(tokenConts.Count == 0) { throw new Exception("No matching token type for supplied parameter"); }
+                if(tokenConts.Count == 0) { 
+                    throw new Exception("No matching token type for supplied parameter");
+                }
                 tokens[curToken].contents = tokenConts[0]; //Apply new contents
             }
         }

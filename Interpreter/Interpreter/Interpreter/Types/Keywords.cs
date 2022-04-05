@@ -11,9 +11,11 @@ namespace Keywords //File for keywords and built in functions/statements
     {
         public static Dictionary<string,(Action<Node[]> act, string delimStart, string delimEnd)> keywords = new Dictionary<string, (Action<Node[]> act, string delimStart, string delimEnd)>() //Keywords and their functions
         {
-            //"if",
-            //"int",
             {"print",(PrintStatement,"(",")")},
+            {"int",(CreateInt," "," ")},
+            {"float",(CreateDecimal," "," ")},
+            {"string",(CreateString," "," ")},
+            {"bool",(CreateBool," "," ")},
         };
         public static (List<Node> outItems, int count) SubsetStatement(string statementName, List<Node> items) //Returns the nodes within the statement parameters. item input is all nodes after the statement, unsorted.
         {
@@ -23,6 +25,22 @@ namespace Keywords //File for keywords and built in functions/statements
                 case "print":
                     {
                         return SimpleStatementDelim(statementName, items);
+                    }
+                case "int":
+                    {
+                        return (new List<Node>() { items[0] }, 1); //Gets next item in the command
+                    }
+                case "float":
+                    {
+                        return (new List<Node>() { items[0] }, 1); //Gets next item in the command
+                    }
+                case "string":
+                    {
+                        return (new List<Node>() { items[0] }, 1); //Gets next item in the command
+                    }
+                case "bool":
+                    {
+                        return (new List<Node>() { items[0] }, 1); //Gets next item in the command
                     }
                 default:
                     throw new Exception("Unknown Statement");
@@ -86,6 +104,25 @@ namespace Keywords //File for keywords and built in functions/statements
         private static void PrintStatement(Node[] nodeInput) //Print the appropriate value to console
         {
             Console.WriteLine(nodeInput[0].contents.ReturnValue()); 
+        }
+
+        //Variable creators
+        private static void CreateInt(Node[] nodeInput){CreateNewVar(nodeInput[0], NodeContentType.Integer);}
+        private static void CreateDecimal(Node[] nodeInput) { CreateNewVar(nodeInput[0], NodeContentType.Decimal); }
+        private static void CreateString(Node[] nodeInput) { CreateNewVar(nodeInput[0], NodeContentType.String); }
+        private static void CreateBool(Node[] nodeInput) { CreateNewVar(nodeInput[0], NodeContentType.Boolean); }
+
+        private static void CreateNewVar(Node newItem, NodeContentType type)
+        {
+            if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable declaration or redeclaration of variable"); }
+            if (Interpreter.Interpreter.globalVars.Contains(newItem.contents.ReturnValue()))
+            {
+                throw new Exception("Redeclaration of variable");
+            }
+            else
+            {
+                Interpreter.Interpreter.globalVars.AddNewItem(newItem.contents.ReturnValue(), new Item(type, null));
+            }
         }
     }
 }
