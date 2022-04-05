@@ -159,7 +159,7 @@ namespace Tokens
 
         public static void CreateTokens(string data, ref List<Token> tokens)
         {
-            List<char?> endChars = new List<char?>() { ' ', '\t', '\n', ';' };
+            List<char?> endChars = new List<char?>() { ' ', '\t', '\n', ';'};
             try
             {
                 bool tokenIsActive = false; //Stores if there is currently a token being appended to
@@ -221,14 +221,14 @@ namespace Tokens
                             }
                         }
 
-                        if ((!newSet || i == data.Length - 1) && tokenIsActive)
+                        if ((!newSet || i == data.Length - 1 || data[i + 1] == '(') && tokenIsActive)
                         {
                             if (!newSet)
                             {
                                 tokens[curToken].contents += data[i];
                             }
 
-                            if (delimChar.Contains(data[i]) || i == data.Length - 1) //If found end character or reached end of text
+                            if (delimChar.Contains(data[i]) || i == data.Length - 1 || data[i + 1] == '(') //If found end character or reached end of text
                             {
                                 ValidateToken(ref tokens, ref curToken, ref tokenIsActive, ref delimChar, ref endChars);
                             }
@@ -413,10 +413,6 @@ namespace Tokens
         {
             return stringSet.EndsWith('\"');
         }
-        public static bool IsNotKeyword(string stringSet)
-        {
-            return !IsBool(stringSet); //Append with other keyword checks
-        }
         public static bool IsIdentifier(string stringSet) //Checks for identifier pattern matches
         {
             if(char.IsDigit(stringSet[0]) || IsStringChar(stringSet)) { return false; } //First character cannot be a number
@@ -466,7 +462,7 @@ namespace Tokens
         }
         private static bool IsValidIdentifier(string stringSet)
         {
-            if(!IsNotKeyword(stringSet)) { return false; }
+            if(IsBool(stringSet) || !IsIdentifier(stringSet)) { return false; }
             return stringSet.Count(x => x == '_') < stringSet.Count();
         }
         public static bool IsDecimal(string stringSet)

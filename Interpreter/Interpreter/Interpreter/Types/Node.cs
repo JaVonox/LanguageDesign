@@ -6,6 +6,7 @@ using NodeOperations;
 using TypeDef;
 using Interpreter; //For loading global variables
 using System.Linq;
+using Keywords;
 
 namespace Nodes
 {
@@ -83,13 +84,6 @@ namespace Nodes
             {typeof(TypeTemplate.Bracket), NodeContentType.Bracket },
         };
 
-        public static List<string> keywords = new List<string>() //Keywords
-        {
-            "if",
-            "int",
-            "print",
-        };
-
         public NodeContentType type;
         public Item contents;
         public Node(Token parentToken)
@@ -130,13 +124,13 @@ namespace Nodes
 
         public static bool IsKeyword(string item)
         {
-            return keywords.Contains(item);
+            return Keywords.Keywords.keywords.ContainsKey(item);
         }
         public bool GetVariable(string name, NodeContentType typing)
         {
             if(typing == NodeContentType.Identifier) //Check if variable
             {
-                if(Interpreter.Interpreter.globalVars.Contains(name) && !keywords.Contains(name))
+                if(Interpreter.Interpreter.globalVars.Contains(name) && !Keywords.Keywords.keywords.ContainsKey(name))
                 {
                     contents = Interpreter.Interpreter.globalVars.GetItem(name);
                     type = contentRef[contents.GetType()];
@@ -249,11 +243,15 @@ namespace Nodes
                 }
                 else
                 {
-                    throw new Exception("END NODE HAD MULTIPLE VALUES");
-                    return null;
+                    throw new Exception("Invalid Expression");
                 }
             }
-            else if(leftValue != null || rightValue != null) //Operator or keyword
+            else if(myNode.type == NodeContentType.Keyword)
+            {
+                Keywords.Keywords.RouteStatement(myNode.contents.ReturnValue(), new Node[]{leftValue, rightValue});
+                return null;
+            }
+            else if(leftValue != null || rightValue != null) //Operator
             {
                 return OperatorInteractions.Interact(leftValue, rightValue, myNode); //Use operator to calculate result of the query
             }

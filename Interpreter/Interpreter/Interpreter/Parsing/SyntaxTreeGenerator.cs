@@ -29,7 +29,7 @@ namespace SyntaxTree
                             storedNodes.Push(new VariantNode(MakeNot(ref storedNodes))); //Make not operation
                         }
                     }
-                    else if(((Node)storedNodes.Peek()._item).type == NodeContentType.End) //If it is an end node, form a tree
+                    else if(((Node)storedNodes.Peek()._item).type == NodeContentType.End || ((Node)storedNodes.Peek()._item).type == NodeContentType.Keyword) //If it is an end node, form a tree
                     {
                         storedNodes.Push(new VariantNode(MakeTreeStack(ref storedNodes))); //Push new tree item
                     }

@@ -77,19 +77,6 @@ namespace NodeOperations
                         throw new Exception("Unimplemented Operation");
                 }
             }
-            else if (opNode.type == NodeContentType.Keyword)
-            {
-                switch (opNode.contents.ReturnValue())
-                {
-                    case "print":
-                        {
-                            Console.WriteLine(lNode.contents.ReturnValue()); //print out the value of the left node
-                            return null;
-                        }
-                    default:
-                        throw new Exception("Unrecognised keyword");
-                }
-            }
             else
             {
                 throw new Exception("Invalid operation used on item");
