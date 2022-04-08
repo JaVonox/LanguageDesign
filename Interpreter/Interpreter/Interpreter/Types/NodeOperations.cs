@@ -62,7 +62,7 @@ namespace NodeOperations
                         }
                         else
                         {
-                            throw new Exception("Could not assign to non-variable item");
+                            throw new Exception("Unknown variable '" + lNode.contents.ReturnShallowValue() + "'");
                         }
                         return lNode; //Return the lNode with updated data
                     default:
@@ -71,7 +71,7 @@ namespace NodeOperations
             }
             else
             {
-                throw new Exception("Invalid operation used on item");
+                throw new Exception("Syntax error");
             }
 
             return new Node(GetTyping(producedItem), producedItem);

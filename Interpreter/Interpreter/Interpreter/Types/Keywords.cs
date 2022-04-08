@@ -58,13 +58,10 @@ namespace Keywords //File for keywords and built in functions/statements
             foreach (Node x in items)
             {
                 counter++;
-                if (x.contents.ReturnShallowValue().ToString() == keywords[statementName].delimStart)
+
+                if (x.contents.ReturnShallowValue().ToString() == keywords[statementName].delimEnd && setCounter >= 0)
                 {
-                    setCounter++;
-                }
-                else if (x.contents.ReturnShallowValue().ToString() == keywords[statementName].delimEnd)
-                {
-                    if(setCounter == 0)
+                    if (setCounter == 0)
                     {
                         isFinish = true;
                         break;
@@ -72,10 +69,15 @@ namespace Keywords //File for keywords and built in functions/statements
 
                     setCounter--;
                 }
-                 
-                if(setCounter >= 0)
+
+                if (setCounter >= 0)
                 {
                     outputSet.Add(x); //Append to the output if within the range
+                }
+
+                if (x.contents.ReturnShallowValue().ToString() == keywords[statementName].delimStart)
+                {
+                    setCounter++;
                 }
             }
 
@@ -105,6 +107,10 @@ namespace Keywords //File for keywords and built in functions/statements
 
         private static void PrintStatement(Node[] nodeInput) //Print the appropriate value to console
         {
+            if(nodeInput.Count() > 1 || nodeInput[0].contents.GetType() == typeof(TypeTemplate.Identifier) && !Interpreter.Interpreter.globalVars.Contains(nodeInput[0].contents.ToString()))
+            {
+                throw new Exception("Invalid parameter(s) in print function");
+            }
             Console.WriteLine(nodeInput[0].contents.ReturnDeepValue()); 
         }
 

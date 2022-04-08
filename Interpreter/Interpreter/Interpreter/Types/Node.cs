@@ -230,7 +230,7 @@ namespace Nodes
                 }
             }
 
-            if (myNode.type == NodeContentType.End)
+            if (myNode.type == NodeContentType.End && (leftValue == null || rightValue == null))
             {
                 line++;
                 if(nodes.Count > 2) //If there are more commands to process

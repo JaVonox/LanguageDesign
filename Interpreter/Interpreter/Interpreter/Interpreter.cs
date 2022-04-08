@@ -38,22 +38,30 @@ namespace Interpreter
                     {
                         if (x.type == NodeContentType.End)
                         {
-                            Tree syntaxTree = CreateCommandTree(nodeSet); //Create tree using statements and expression data
-                            nodeSet.Clear(); //Clears the node set to allow for reallocation
+                            if (nodeSet.Count > 0) //Skip empty statements
+                            {
+                                Tree syntaxTree = CreateCommandTree(nodeSet); //Create tree using statements and expression data
+                                nodeSet.Clear(); //Clears the node set to allow for reallocation
 
-                            if (fullTree == null) //If tree is not yet set
-                            {
-                                fullTree = syntaxTree;
-                            }
-                            else //If tree exists
-                            {
-                                fullTree.InsertAtNextCommand(syntaxTree); //Add command to tree
+                                if (fullTree == null) //If tree is not yet set
+                                {
+                                    fullTree = syntaxTree;
+                                }
+                                else //If tree exists
+                                {
+                                    fullTree.InsertAtNextCommand(syntaxTree); //Add command to tree
+                                }
                             }
                         }
                         else
                         {
                             nodeSet.Add(new Node(x)); //Add node to set
                         }
+                    }
+
+                    if(nodeSet.Count > 0)
+                    {
+                        throw new Exception("Syntax error - is there a missing ; or \" ?");
                     }
 
                     line = 1;
@@ -98,7 +106,7 @@ namespace Interpreter
 
             if (nodeSet.Count > 0)
             {
-                throw new Exception("Code recognised outside of statement"); //Maybe TODO? this checks for code outside an expression or statement.
+                throw new Exception("Syntax error - functions must encapsulate all code in a statement"); //Maybe TODO? this checks for code outside an expression or statement.
             }
 
             Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
