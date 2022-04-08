@@ -25,7 +25,7 @@ quickMaths = quickMaths + 1;
 print("BB: " + bb);
 print("QM: " + quickMaths);
 bool x;
-x = ("foo" + "bar" == "foobar");
+x = !(True);
 print("foobar " +x);
 string foo_bar;
 foo_bar = "AAA";

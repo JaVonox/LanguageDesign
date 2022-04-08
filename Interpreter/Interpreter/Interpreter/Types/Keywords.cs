@@ -19,6 +19,7 @@ namespace Keywords //File for keywords and built in functions/statements
         };
         public static (List<Node> outItems, int count) SubsetStatement(string statementName, List<Node> items) //Returns the nodes within the statement parameters. item input is all nodes after the statement, unsorted.
         {
+            if (items.Count == 0) { throw new Exception("Unexpected keyword '" + statementName + "'"); }
             //Assumes the statement has been removed but the delimiters havent
             switch(statementName)
             {
@@ -93,6 +94,7 @@ namespace Keywords //File for keywords and built in functions/statements
 
             if (keywords.ContainsKey(statementName))
             {
+                if (passedArgs.Count() == 0) { throw new Exception("Unexpected keyword '" + statementName + "'"); }
                 keywords[statementName].act.Invoke(passedArgs);
             }
             else

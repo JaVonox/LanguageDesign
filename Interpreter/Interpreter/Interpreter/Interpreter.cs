@@ -17,19 +17,15 @@ namespace Interpreter
     //string variables currently accept assignment like foobar = 1, creating a variable with value "1". This may need fixing.
     //Input cannot be a statement because it returns a value
 
-    //Whole program must become a single AST
-    //therefore trees should be able to have more than 2 nodes
-    //Do error messages between different types
-
     //Its possible to have more than one keyword or = in a statement. remove this.
     class Interpreter
     {
-        private List<List<Token>> commands = new List<List<Token>>(); //Commands -> set of tokens
         public static LoadedVariables globalVars = new LoadedVariables(); //Global variables
         public Interpreter(string input)
         {
-            //try
-            //{
+            int line = 0;
+            try
+            {
                 List<Token> tokens = new List<Token>(); //Token set
                 TokenHandler.CreateTokens(input, ref tokens); //Creates tokens for entire script
 
@@ -59,15 +55,24 @@ namespace Interpreter
                             nodeSet.Add(new Node(x)); //Add node to set
                         }
                     }
-                    Node? resultSyn = fullTree.CalculateTreeResult(); //Calculate from tree
+
+                    line = 1;
+                    Node? resultSyn = fullTree.CalculateTreeResult(ref line); //Calculate from tree
 
 
                 }
-            //}
-            //catch(Exception ex)
-            //{
-            //    Console.WriteLine("An error occured - " + ex);
-            //}
+            }
+            catch(Exception ex)
+            {
+                if (line == 0)
+                {
+                    Console.WriteLine("An error occured while building the program - " + ex.Message);
+                }
+                else
+                {
+                    Console.WriteLine("Error on statement " + line + ": " + ex.Message);
+                }
+            }
         }
 
         private Tree CreateCommandTree(List<Node> nodeSet)

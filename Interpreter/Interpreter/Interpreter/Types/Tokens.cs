@@ -287,7 +287,7 @@ namespace Tokens
 
                 if (tokenOuts.Count() == 0) //If no matches
                 {
-                    throw new Exception("No matching token type for supplied parameter");
+                    throw new Exception("Syntax error - No matching token for supplied parameter");
                 }
                 else if (tokenOuts.Count() > 1 || tokenOuts.Sum(x => x.valid.Count()) > 1) //If multiple possible tokens
                 {
@@ -295,7 +295,7 @@ namespace Tokens
 
                     if (!sortFixed)
                     {
-                        throw new Exception("Substring '" + contents + "' Could not be sorted");
+                        throw new Exception("Syntax error - ambigious token '" + contents + "'");
                     }
                 }
                 else
@@ -313,7 +313,7 @@ namespace Tokens
 
                     if (tokenOuts.Sum(x => x.valid.Sum(y => y.Count())) < contCount) //Check the parameters fill the entire content 
                     {
-                        throw new Exception("No matching token type for supplied parameter");
+                        throw new Exception("Syntax error - No matching token for supplied parameter");
                     }
                     else
                     {
@@ -327,7 +327,7 @@ namespace Tokens
                 List<string> tokenConts = new List<string> { tmp.contents };
                 condRefs.First(x => x.inType == tmp.type).ApplyFinalConds(ref tokenConts);
                 if(tokenConts.Count == 0) { 
-                    throw new Exception("No matching token type for supplied parameter");
+                    throw new Exception("Syntax error - No matching token for supplied parameter");
                 }
                 tokens[curToken].contents = tokenConts[0]; //Apply new contents
             }

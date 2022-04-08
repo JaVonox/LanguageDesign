@@ -201,7 +201,7 @@ namespace Nodes
 
             return corrString;
         }
-        public Node? CalculateTreeResult()
+        public Node? CalculateTreeResult(ref int line)
         {
             Node? leftValue = null;
             Node? rightValue = null;
@@ -214,7 +214,7 @@ namespace Nodes
                 }
                 else
                 {
-                    leftValue = new Node(((Tree)(nodes[0]._item)).CalculateTreeResult()); //Get tree result from this item
+                    leftValue = new Node(((Tree)(nodes[0]._item)).CalculateTreeResult(ref line)); //Get tree result from this item
                 }
             }
 
@@ -226,15 +226,16 @@ namespace Nodes
                 }
                 else
                 {
-                    rightValue = new Node(((Tree)(nodes[1]._item)).CalculateTreeResult()); //Get tree result from this item
+                    rightValue = new Node(((Tree)(nodes[1]._item)).CalculateTreeResult(ref line)); //Get tree result from this item
                 }
             }
 
             if (myNode.type == NodeContentType.End)
             {
+                line++;
                 if(nodes.Count > 2) //If there are more commands to process
                 {
-                    return new Node(((Tree)(nodes[2]._item)).CalculateTreeResult()); //Process the next command in the set
+                    return new Node(((Tree)(nodes[2]._item)).CalculateTreeResult(ref line)); //Process the next command in the set
                 }
                 else
                 {
