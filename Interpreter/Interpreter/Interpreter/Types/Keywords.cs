@@ -57,11 +57,11 @@ namespace Keywords //File for keywords and built in functions/statements
             foreach (Node x in items)
             {
                 counter++;
-                if (x.contents.ReturnValue().ToString() == keywords[statementName].delimStart)
+                if (x.contents.ReturnShallowValue().ToString() == keywords[statementName].delimStart)
                 {
                     setCounter++;
                 }
-                else if (x.contents.ReturnValue().ToString() == keywords[statementName].delimEnd)
+                else if (x.contents.ReturnShallowValue().ToString() == keywords[statementName].delimEnd)
                 {
                     if(setCounter == 0)
                     {
@@ -71,7 +71,7 @@ namespace Keywords //File for keywords and built in functions/statements
 
                     setCounter--;
                 }
-
+                 
                 if(setCounter >= 0)
                 {
                     outputSet.Add(x); //Append to the output if within the range
@@ -103,7 +103,7 @@ namespace Keywords //File for keywords and built in functions/statements
 
         private static void PrintStatement(Node[] nodeInput) //Print the appropriate value to console
         {
-            Console.WriteLine(nodeInput[0].contents.ReturnValue()); 
+            Console.WriteLine(nodeInput[0].contents.ReturnDeepValue()); 
         }
 
         //Variable creators
@@ -114,14 +114,14 @@ namespace Keywords //File for keywords and built in functions/statements
 
         private static void CreateNewVar(Node newItem, NodeContentType type)
         {
-            if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable declaration or redeclaration of variable " + newItem.contents.ReturnValue()); }
-            if (Interpreter.Interpreter.globalVars.Contains(newItem.contents.ReturnValue()))
+            if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable declaration or redeclaration of variable " + newItem.contents.ReturnShallowValue()); }
+            if (Interpreter.Interpreter.globalVars.Contains(newItem.contents.ReturnShallowValue()))
             {
-                throw new Exception("Redeclaration of variable " + newItem.contents.ReturnValue());
+                throw new Exception("Redeclaration of variable " + newItem.contents.ReturnShallowValue());
             }
             else
             {
-                Interpreter.Interpreter.globalVars.AddNewItem(newItem.contents.ReturnValue(), new Item(type, null));
+                Interpreter.Interpreter.globalVars.AddNewItem(newItem.contents.ReturnShallowValue(), new Item(type, null));
             }
         }
     }

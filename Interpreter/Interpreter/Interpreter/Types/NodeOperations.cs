@@ -14,7 +14,7 @@ namespace NodeOperations
 
             if (opNode.type == NodeContentType.Operation)
             {
-                switch (opNode.contents.ReturnValue())
+                switch (opNode.contents.ReturnDeepValue())
                 {
                     case "+":
                         producedItem = lNode.contents + rNode.contents;
@@ -56,11 +56,7 @@ namespace NodeOperations
                         producedItem = Item.Not(lNode.contents);
                         break;
                     case "=":
-                        if (lNode.type == NodeContentType.Identifier) //If undefined variable
-                        {
-                            throw new Exception("Unknown variable"); 
-                        }
-                        else if(Interpreter.Interpreter.globalVars.Contains(lNode.contents))
+                        if(lNode.type == NodeContentType.Identifier && Interpreter.Interpreter.globalVars.Contains(lNode.contents.ReturnShallowValue()))
                         {
                             Item.SetContent(lNode.contents, rNode.contents);
                         }

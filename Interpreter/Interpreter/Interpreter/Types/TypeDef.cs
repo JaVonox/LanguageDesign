@@ -3,16 +3,28 @@ using System.Collections.Generic;
 using System.Text;
 using Nodes;
 using Tokens;
-
+using Interpreter;
 namespace TypeDef
 {
     public class Item
     {
         private TypeTemplate content { get; set; }
 
-        public dynamic ReturnValue() //Return the type-adjusted contents of the item
+        public dynamic ReturnDeepValue() //Return the true value of an item - variable contents or real value
         {
-            return content.contents;
+            if (GetType() == typeof(TypeTemplate.Identifier) && Interpreter.Interpreter.globalVars.Contains(content.contents.ToString()))
+            {
+                return Interpreter.Interpreter.globalVars.GetItem(content.contents.ToString()).ReturnShallowValue(); //Get the contents of the item
+            }
+            else
+            {
+                return ReturnShallowValue(); //Get the non-variable item
+            }
+        }
+
+        public dynamic ReturnShallowValue() //Return the type-adjusted contents of the item. In variables this stores the name of the value
+        {
+            return content.contents; //Get the non-variable item
         }
 
         public Type GetType() //Return the value type
@@ -22,7 +34,7 @@ namespace TypeDef
 
         public string GetStringContents()
         {
-            return ReturnValue().ToString();
+            return ReturnDeepValue().ToString();
         }
         //Constructors
         public Item(Token item)
@@ -79,7 +91,7 @@ namespace TypeDef
                         content.contents = inContents;
                         break;
                     }
-                case NodeContentType.Identifier: //Runs when variable is not in global area. When assigned to 
+                case NodeContentType.Identifier: //Variables and keywords
                     {
                         content = new TypeTemplate.Identifier();
                         content.contents = inContents; //contents is variable name
@@ -90,67 +102,90 @@ namespace TypeDef
             }
         }
 
-        private static void IsInvalid(Item self, Item ext)
+        private static void SetVars(ref Item self, ref Item ext)
         {
-            if(self.GetType() == typeof(TypeTemplate.Identifier) || ext.GetType() == typeof(TypeTemplate.Identifier)) { throw new Exception("Use of variable " + self.ReturnValue() +" before assignment"); }
+            if(self.GetType() == typeof(TypeTemplate.Identifier))
+            {
+                GetVariable(ref self); //Sets self to its appropriate value if needed 
+            }
+
+            if (ext.GetType() == typeof(TypeTemplate.Identifier))
+            {
+                GetVariable(ref ext); //Sets ext to its appropriate value if needed 
+            }
+        }
+        private static void GetVariable(ref Item item) //Gets the variable item of a value
+        {
+            if (item.GetType() == typeof(TypeTemplate.Identifier))
+            {
+                if (Interpreter.Interpreter.globalVars.Contains(item.ReturnShallowValue()))
+                {
+                    item = Interpreter.Interpreter.globalVars.GetItem(item.ReturnShallowValue());
+                }
+                else
+                {
+                    throw new Exception("Use of variable " + item.ReturnShallowValue() + " before assignment");
+                }
+
+            }
         }
         //Equations
 
         public static Item operator +(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.AddOperation(self, ext);
         }
         public static Item operator -(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.SubOperation(self, ext);
         }
         public static Item operator *(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.MultOperation(self, ext);
         }
         public static Item operator /(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.DivOperation(self, ext);
         }
 
         //Value checking
         public static Item LessThan(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.LessThan(self, ext);
         }
         public static Item GreaterThan(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.GreaterThan(self, ext);
         }
         public static Item EqualTo(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.EqualTo(self, ext);
         }
         public static Item NotEqualTo(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.NotEqualTo(self, ext);
         }
         public static Item LessThanEqualTo(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             Item lessOp = self.content.LessThan(self, ext);
-            if (lessOp.ReturnValue()) { return lessOp; }
+            if (lessOp.ReturnDeepValue()) { return lessOp; }
             Item equalOp = self.content.EqualTo(self, ext);
             return equalOp;
         }
         public static Item GreaterThanEqualTo(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             Item gOp = self.content.GreaterThan(self, ext);
-            if (gOp.ReturnValue()) { return gOp; }
+            if (gOp.ReturnDeepValue()) { return gOp; }
             Item equalOp = self.content.EqualTo(self, ext);
             return equalOp;
         }
@@ -158,22 +193,36 @@ namespace TypeDef
         //Boolean
         public static Item And(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.And(self, ext);
         }
         public static Item Or(Item self, Item ext)
         {
-            IsInvalid(self, ext);
+            SetVars(ref self, ref ext);
             return self.content.Or(self, ext);
         }
         public static Item Not(Item self)
         {
-            if (Nodes.Node.contentRef[self.GetType()] == NodeContentType.Identifier) { throw new Exception("Use of variable before assignment"); }
+            GetVariable(ref self);
             return self.content.Not(self);
         }
-        public static void SetContent(Item self, Item newContents)
+        public static void SetContent(Item self, Item newContents) //TODO add type checking
         {
-            self.content.SetItem(newContents);
+            if (self.GetType() == typeof(TypeTemplate.Identifier))
+            {
+                if (Interpreter.Interpreter.globalVars.Contains(self.ReturnShallowValue()))
+                {
+                    Interpreter.Interpreter.globalVars.UpdateItem(self.ReturnShallowValue(), newContents.ReturnDeepValue()); //Set the value in the variable storage
+                }
+                else
+                {
+                    throw new Exception("Use of variable " + self.ReturnShallowValue() + " before assignment");
+                }
+            }
+            else
+            {
+                self.content.SetItem(newContents); //Set the node value for use in the tree
+            }
         }
     }
     public abstract class TypeTemplate //Matching unit object
@@ -190,7 +239,7 @@ namespace TypeDef
 
         public void SetItem(Item newItem)
         {
-            contents = newItem.ReturnValue(); //Set the value. TODO add type checking
+            contents = newItem.ReturnDeepValue(); //Set the value. TODO add type checking
         }
         public abstract Item AddOperation(Item self, Item ext);
         public abstract Item SubOperation(Item self, Item ext);
@@ -203,7 +252,7 @@ namespace TypeDef
         public abstract Item EqualTo(Item self, Item ext);
         public Item NotEqualTo(Item self, Item ext)
         {
-            return new Item(NodeContentType.Boolean, !Convert.ToBoolean(EqualTo(self, ext).ReturnValue()));
+            return new Item(NodeContentType.Boolean, !Convert.ToBoolean(EqualTo(self, ext).ReturnDeepValue()));
         }
 
         //Bool Logic
@@ -223,11 +272,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Integer, self.ReturnValue() + ext.ReturnValue());
+                            return new Item(NodeContentType.Integer, self.ReturnDeepValue() + ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, (float)(self.ReturnValue()) + ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, (float)(self.ReturnDeepValue()) + ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -240,11 +289,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Integer, self.ReturnValue() - ext.ReturnValue());
+                            return new Item(NodeContentType.Integer, self.ReturnDeepValue() - ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, (float)(self.ReturnValue()) - ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, (float)(self.ReturnDeepValue()) - ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -256,11 +305,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Integer, self.ReturnValue() * ext.ReturnValue());
+                            return new Item(NodeContentType.Integer, self.ReturnDeepValue() * ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, (float)(self.ReturnValue()) * ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, (float)(self.ReturnDeepValue()) * ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -272,11 +321,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Decimal, (float)(self.ReturnValue()) / (float)(ext.ReturnValue()));
+                            return new Item(NodeContentType.Decimal, (float)(self.ReturnDeepValue()) / (float)(ext.ReturnDeepValue()));
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, (float)(self.ReturnValue()) / ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, (float)(self.ReturnDeepValue()) / ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -289,11 +338,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() < ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() < ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Boolean, (float)self.ReturnValue() < ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, (float)self.ReturnDeepValue() < ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -305,11 +354,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() > ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() > ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Boolean, (float)self.ReturnValue() > ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, (float)self.ReturnDeepValue() > ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -322,11 +371,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() == ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() == ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Boolean, (float)self.ReturnValue() == ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, (float)self.ReturnDeepValue() == ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -351,11 +400,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() + (float)(ext.ReturnValue()));
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() + (float)(ext.ReturnDeepValue()));
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() + ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() + ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -368,11 +417,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() - (float)(ext.ReturnValue()));
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() - (float)(ext.ReturnDeepValue()));
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() - ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() - ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -385,11 +434,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() * (float)(ext.ReturnValue()));
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() * (float)(ext.ReturnDeepValue()));
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() * ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() * ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -402,11 +451,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() / (float)(ext.ReturnValue()));
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() / (float)(ext.ReturnDeepValue()));
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Decimal, self.ReturnValue() / ext.ReturnValue());
+                            return new Item(NodeContentType.Decimal, self.ReturnDeepValue() / ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -419,11 +468,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() < (float)ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() < (float)ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() < ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() < ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -435,11 +484,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() > (float)ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() > (float)ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() > ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() > ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -452,11 +501,11 @@ namespace TypeDef
                 {
                     case "Integer":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() == (float)ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() == (float)ext.ReturnDeepValue());
                         }
                     case "Decimal":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() == ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() == ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -476,15 +525,7 @@ namespace TypeDef
 
             public override Item AddOperation(Item self, Item ext)
             {
-                switch (ext.GetType().Name)
-                {
-                    case "String":
-                        {
-                            return new Item(NodeContentType.String, self.ReturnValue() + ext.ReturnValue());
-                        }
-                    default:
-                        throw new Exception("Unsupported interaction");
-                }
+                return new Item(NodeContentType.String, self.ReturnDeepValue() + ext.ReturnDeepValue().ToString());
             }
 
             public override Item SubOperation(Item self, Item ext) { throw new Exception("Unsupported interaction"); }
@@ -498,7 +539,7 @@ namespace TypeDef
                 {
                     case "String":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() == ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() == ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -546,7 +587,7 @@ namespace TypeDef
                 {
                     case "Boolean":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() == ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() == ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -558,7 +599,7 @@ namespace TypeDef
                 {
                     case "Boolean":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() && ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() && ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -570,7 +611,7 @@ namespace TypeDef
                 {
                     case "Boolean":
                         {
-                            return new Item(NodeContentType.Boolean, self.ReturnValue() || ext.ReturnValue());
+                            return new Item(NodeContentType.Boolean, self.ReturnDeepValue() || ext.ReturnDeepValue());
                         }
                     default:
                         throw new Exception("Unsupported interaction");
@@ -578,7 +619,7 @@ namespace TypeDef
             }
             public override Item Not(Item self)
             {
-                return new Item(NodeContentType.Boolean, !Convert.ToBoolean(self.ReturnValue()));
+                return new Item(NodeContentType.Boolean, !Convert.ToBoolean(self.ReturnDeepValue()));
             }
 
         }

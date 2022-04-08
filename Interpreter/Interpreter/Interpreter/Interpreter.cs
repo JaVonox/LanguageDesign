@@ -20,66 +20,54 @@ namespace Interpreter
     //Whole program must become a single AST
     //therefore trees should be able to have more than 2 nodes
     //Do error messages between different types
+
+    //Its possible to have more than one keyword or = in a statement. remove this.
     class Interpreter
     {
         private List<List<Token>> commands = new List<List<Token>>(); //Commands -> set of tokens
         public static LoadedVariables globalVars = new LoadedVariables(); //Global variables
         public Interpreter(string input)
         {
-            int curLine = -1;
-            try
-            {
+            //try
+            //{
                 List<Token> tokens = new List<Token>(); //Token set
                 TokenHandler.CreateTokens(input, ref tokens); //Creates tokens for entire script
 
-                if (tokens.Count > 0)
+                if (tokens.Count > 0) //If there is a set of tokens, begin building the tree
                 {
-                    //Sorting tokens into command sets
-                    int iterate = -1; //Index for sorting tokens into command sets
-                    foreach (Token t in tokens)
-                    {
-                        if (t.type == NodeContentType.End || iterate == -1)
-                        {
-                            iterate++;
-                            commands.Add(new List<Token>() { });
+                    Tree fullTree = null;
+                    List<Node> nodeSet = new List<Node>(); //Node representation of tokens
 
-                            if(iterate == 0)
+                    foreach (Token x in tokens) //Parse and compute
+                    {
+                        if (x.type == NodeContentType.End)
+                        {
+                            Tree syntaxTree = CreateCommandTree(nodeSet); //Create tree using statements and expression data
+                            nodeSet.Clear(); //Clears the node set to allow for reallocation
+
+                            if (fullTree == null) //If tree is not yet set
                             {
-                                commands[iterate].Add(t);
+                                fullTree = syntaxTree;
+                            }
+                            else //If tree exists
+                            {
+                                fullTree.InsertAtNextCommand(syntaxTree); //Add command to tree
                             }
                         }
                         else
                         {
-                            commands[iterate].Add(t);
+                            nodeSet.Add(new Node(x)); //Add node to set
                         }
                     }
+                    Node? resultSyn = fullTree.CalculateTreeResult(); //Calculate from tree
 
-                    if (commands[iterate].Count == 0)
-                    {
-                        commands.RemoveAt(iterate);
-                    }
-
-                    foreach (List<Token> tSet in commands) //Parse and compute
-                    {
-                        curLine = commands.IndexOf(tSet) + 1;
-                        List<Node> nodeSet = new List<Node>(); //Convert tokens for this command into nodes
-                        foreach(Token t in tSet)
-                        {
-                            nodeSet.Add(new Node(t));
-                            //Console.WriteLine(t.type + ":" + t.contents);
-                        }
-
-                        Tree syntaxTree = CreateCommandTree(nodeSet); //Create tree using statements and expression data
-
-                        Node? resultSyn = syntaxTree.CalculateTreeResult(); //Calculate from tree
-                    }
 
                 }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine("An error occured on line " + curLine + " - " + ex.Message);
-            }
+            //}
+            //catch(Exception ex)
+            //{
+            //    Console.WriteLine("An error occured - " + ex);
+            //}
         }
 
         private Tree CreateCommandTree(List<Node> nodeSet)
@@ -87,11 +75,10 @@ namespace Interpreter
             Queue<Node> output = new Queue<Node>();
             if (nodeSet[0].type == NodeContentType.Keyword) //Check for keyword
             {
-                //TODO this currently only processes the entire set, change this maybe?
                 Node firstItem = nodeSet[0];
                 nodeSet.RemoveAt(0);
 
-                (List<Node> n, int count) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnValue(), nodeSet); //Returns only the nodes within the parameters
+                (List<Node> n, int count) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnShallowValue(), nodeSet); //Returns only the nodes within the parameters
                 output = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.n); //Convert to postfix
                 output.Enqueue(firstItem); //Apply statement token
                 nodeSet.RemoveRange(0, containingExpression.count);
@@ -99,11 +86,12 @@ namespace Interpreter
             else
             {
                 output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet); //Convert to postfix
-                output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
                 nodeSet.Clear();
             }
 
-            if(nodeSet.Count > 0)
+            output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
+
+            if (nodeSet.Count > 0)
             {
                 throw new Exception("Code recognised outside of statement"); //Maybe TODO? this checks for code outside an expression or statement.
             }

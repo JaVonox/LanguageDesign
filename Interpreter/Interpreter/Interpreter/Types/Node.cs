@@ -47,7 +47,7 @@ namespace Nodes
         public Item AddNewItem(string name, Item contents) //Add new variable and return the newly created variable ref
         {
             if (Node.IsKeyword(name)) { throw new Exception("Invalid variable name"); }
-            Item newItem = new Item(Node.contentRef[contents.GetType()], contents.ReturnValue());
+            Item newItem = new Item(Node.contentRef[contents.GetType()], contents.ReturnDeepValue());
             variables.Add(name, newItem);
             return variables[name];
         }
@@ -61,7 +61,6 @@ namespace Nodes
         {
             _item = inherit;
         }
-
         public VariantNode(Tree inherit)
         {
             _item = inherit;
@@ -116,7 +115,7 @@ namespace Nodes
         }
         public void CheckKeyword()
         {
-            if(type == NodeContentType.Identifier && IsKeyword(contents.ReturnValue()))
+            if(type == NodeContentType.Identifier && IsKeyword(contents.ReturnShallowValue()))
             {
                 type = NodeContentType.Keyword;
             }
@@ -144,50 +143,58 @@ namespace Nodes
     public class Tree
     {
         public Node myNode; //Operator 
-        public VariantNode? leftNode;
-        public VariantNode? rightNode;
+        public List<VariantNode?> nodes = new List<VariantNode?>(); // 0 as left, 1 as right
 
         public Tree(Node self, VariantNode? left, VariantNode? right)
         {
             myNode = self;
-            leftNode = left;
-            rightNode = right;
+            nodes.Add(left);
+            nodes.Add(right);
+        }
+
+        public Tree(Node self, VariantNode?[] compNodes)
+        {
+            myNode = self;
+            nodes = compNodes.ToList();
+        }
+        public void InsertAtNextCommand(Tree newCommandTree) //Inserts a new command after the end node
+        {
+            if(myNode.type == NodeContentType.End)
+            {
+                if(nodes.Count == 2) //If completed tree
+                {
+                    nodes.Add(new VariantNode(newCommandTree)); //Add tree as 3rd item to end node
+                }
+                else if(nodes.Count == 3)
+                {
+                    nodes[2].ToTree().InsertAtNextCommand(newCommandTree); //Add the node at next command
+                }
+                
+            }
         }
         public string PrintTreeContents()
         {
             string corrString = "(";
-            corrString += myNode.contents.ReturnValue();
+            corrString += myNode.contents.ReturnShallowValue();
 
-            if (leftNode != null)
+
+            foreach(VariantNode x in nodes)
             {
-                if (leftNode._item.GetType() == typeof(Tree))
+                if (x != null)
                 {
-                    corrString += ((Tree)leftNode._item).PrintTreeContents();
+                    if (x._item.GetType() == typeof(Tree))
+                    {
+                        corrString += ((Tree)x._item).PrintTreeContents();
+                    }
+                    else
+                    {
+                        corrString += ((Node)x._item).contents.ReturnShallowValue();
+                    }
                 }
                 else
                 {
-                    corrString += ((Node)leftNode._item).contents.ReturnValue();
+                    corrString += "<NULL>";
                 }
-            }
-            else
-            {
-                corrString += "<NULL>";
-            }
-
-            if (rightNode != null)
-            {
-                if (rightNode._item.GetType() == typeof(Tree))
-                {
-                    corrString += ((Tree)rightNode._item).PrintTreeContents();
-                }
-                else
-                {
-                    corrString += ((Node)rightNode._item).contents.ReturnValue();
-                }
-            }
-            else
-            {
-                corrString += "<NULL>";
             }
 
             corrString += ")";
@@ -199,57 +206,45 @@ namespace Nodes
             Node? leftValue = null;
             Node? rightValue = null;
 
-            if (leftNode != null)
+            if (nodes[0] != null)
             {
-                if (leftNode._item.GetType() == typeof(Node))
+                if (nodes[0]._item.GetType() == typeof(Node))
                 {
-                    leftValue = new Node((Node)(leftNode._item)); //Get node value
+                    leftValue = new Node((Node)(nodes[0]._item)); //Get node value
                 }
                 else
                 {
-                    leftValue = new Node(((Tree)(leftNode._item)).CalculateTreeResult()); //Get tree result from this item
+                    leftValue = new Node(((Tree)(nodes[0]._item)).CalculateTreeResult()); //Get tree result from this item
                 }
             }
 
-            if (rightNode != null)
+            if (nodes[1] != null)
             {
-                if (rightNode._item.GetType() == typeof(Node))
+                if (nodes[1]._item.GetType() == typeof(Node))
                 {
-                    rightValue = new Node((Node)(rightNode._item)); //Get node value
+                    rightValue = new Node((Node)(nodes[1]._item)); //Get node value
                 }
                 else
                 {
-                    rightValue = new Node(((Tree)(rightNode._item)).CalculateTreeResult()); //Get tree result from this item
+                    rightValue = new Node(((Tree)(nodes[1]._item)).CalculateTreeResult()); //Get tree result from this item
                 }
             }
 
             if (myNode.type == NodeContentType.End)
             {
-                if(leftValue != null && rightValue == null)
+                if(nodes.Count > 2) //If there are more commands to process
                 {
-                    return leftValue;
-                }
-                else if(leftValue == null && rightValue != null)
-                {
-                    return rightValue;
-                }
-                else if(leftValue == null && rightValue == null)
-                {
-                    return null;
-                }
-                else if(leftValue.type == NodeContentType.Keyword)
-                {
-                    return OperatorInteractions.Interact(rightValue, null, leftValue); //Process single argument keywords
+                    return new Node(((Tree)(nodes[2]._item)).CalculateTreeResult()); //Process the next command in the set
                 }
                 else
                 {
-                    throw new Exception("Invalid Expression");
+                    return myNode;
                 }
             }
             else if(myNode.type == NodeContentType.Keyword)
             {
-                Keywords.Keywords.RouteStatement(myNode.contents.ReturnValue(), new Node[]{leftValue, rightValue});
-                return null;
+                Keywords.Keywords.RouteStatement(myNode.contents.ReturnShallowValue(), new Node[]{leftValue, rightValue});
+                return myNode;
             }
             else if(leftValue != null || rightValue != null) //Operator
             {
@@ -258,7 +253,6 @@ namespace Nodes
             else
             {
                 throw new Exception("Calculation Error");
-                return null;
             }
         }
     }
