@@ -172,14 +172,25 @@ namespace Nodes
                 
             }
         }
+
+        static int depth = 1; //Tree depth
         public string PrintTreeContents()
         {
-            string corrString = "(";
-            corrString += myNode.contents.ReturnShallowValue();
+            string corrString = "";
+            corrString += ApplyDepth(myNode.contents.ReturnShallowValue(),true);
 
 
+            depth++;
+
+            int index = 0;
+            bool isLast = false;
             foreach(VariantNode x in nodes)
             {
+                index++;
+                if(index == nodes.Count)
+                {
+                    isLast = true;
+                }
                 if (x != null)
                 {
                     if (x._item.GetType() == typeof(Tree))
@@ -188,18 +199,49 @@ namespace Nodes
                     }
                     else
                     {
-                        corrString += ((Node)x._item).contents.ReturnShallowValue();
+                        corrString += ApplyDepth(((Node)x._item).contents.ReturnShallowValue().ToString(),isLast);
                     }
                 }
                 else
                 {
-                    corrString += "<NULL>";
+                    corrString += ApplyDepth("<NULL>",isLast);
+                }
+            }
+            depth--;
+
+            return corrString;
+        }
+
+        private string ApplyDepth(string input, bool isLast)
+        {
+            string formatIn = "\n";
+
+            if (depth != 1)
+            {
+                for (int i = 0; i < depth; i++)
+                {
+                    if (i == depth - 1)
+                    {
+                        if (isLast)
+                        {
+                            formatIn += "└─";
+                        }
+                        else
+                        {
+                            formatIn += "├─";
+                        }
+                    }
+                    else
+                    {
+                        formatIn += " "; //Add space to tree to make depth
+                    }
+
                 }
             }
 
-            corrString += ")";
+            formatIn += input;
 
-            return corrString;
+            return formatIn;
         }
         public Node? CalculateTreeResult(ref int line)
         {
