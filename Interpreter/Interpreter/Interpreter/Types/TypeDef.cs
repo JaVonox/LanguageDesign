@@ -254,6 +254,18 @@ namespace TypeDef
                 throw new Exception("Assignment operator on non-variable item");
             }
         }
+
+        public static bool Assignable(Item self, string query) //Check if an input is of the correct type
+        {
+            if (self.ReturnDeepVar().content.IsValidValue(query)) //Check if the types are compatible
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception("Invalid assignment of value '" + query + "' to variable " + self.ReturnShallowValue() + " of type " + self.ReturnDeepVarType().Name); 
+            }
+        }
     }
     public abstract class TypeTemplate //Matching unit object
     {
@@ -293,6 +305,8 @@ namespace TypeDef
         //Assignment conditions
 
         public abstract bool CanAssign(dynamic ext);
+
+        public abstract bool IsValidValue(string ext);
         public sealed class Integer : TypeTemplate
         {
             public override object contents
@@ -426,6 +440,12 @@ namespace TypeDef
             public override bool CanAssign(dynamic ext)
             {
                 if(ext.GetType() == typeof(int)){ return true; }
+                else { return false; }
+            }
+            public override bool IsValidValue(string ext)
+            {
+                int x = 0;
+                if (int.TryParse(ext,out x)) { return true; }
                 else { return false; }
             }
         }
@@ -566,6 +586,12 @@ namespace TypeDef
                 if (ext.GetType() == typeof(float)) { return true; }
                 else { return false; }
             }
+            public override bool IsValidValue(string ext)
+            {
+                double x = 0;
+                if (double.TryParse(ext, out x)) { return true; }
+                else { return false; }
+            }
         }
         public sealed class String : TypeTemplate
         {
@@ -605,6 +631,11 @@ namespace TypeDef
                 if (ext.GetType() == typeof(string)) { return true; }
                 else { return false; }
             }
+
+            public override bool IsValidValue(string ext)
+            {
+                return true; //May need reworking
+            }
         }
         public sealed class Operation : TypeTemplate
         {
@@ -627,6 +658,11 @@ namespace TypeDef
             public override bool CanAssign(dynamic ext)
             {
                 throw new Exception("Assignment of operation item");
+            }
+
+            public override bool IsValidValue(string ext)
+            {
+                return false;
             }
         }
         public sealed class Boolean : TypeTemplate
@@ -687,6 +723,11 @@ namespace TypeDef
                 if (ext.GetType() == typeof(bool)) { return true; }
                 else { return false; }
             }
+            public override bool IsValidValue(string ext)
+            {
+                if (ext == "true" || ext == "false" || ext == "True" || ext == "False") { return true; }
+                else { return false; }
+            }
         }
         public sealed class End : TypeTemplate
         {
@@ -708,6 +749,10 @@ namespace TypeDef
             public override bool CanAssign(dynamic ext)
             {
                 throw new Exception("Assignment of end item");
+            }
+            public override bool IsValidValue(string ext)
+            {
+                return false;
             }
         }
         public sealed class Bracket : TypeTemplate
@@ -731,6 +776,11 @@ namespace TypeDef
             {
                 throw new Exception("Assignment of bracket item");
             }
+
+            public override bool IsValidValue(string ext)
+            {
+                return false;
+            }
         }
         public sealed class Identifier : TypeTemplate //Typeless identifier - unassigned.
         {
@@ -752,6 +802,10 @@ namespace TypeDef
             public override bool CanAssign(dynamic ext)
             {
                 throw new Exception("Assignment of shallow variable value");
+            }
+            public override bool IsValidValue(string ext)
+            {
+                return false;
             }
         }
     }

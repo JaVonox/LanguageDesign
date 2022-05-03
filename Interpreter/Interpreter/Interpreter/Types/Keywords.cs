@@ -12,6 +12,7 @@ namespace Keywords //File for keywords and built in functions/statements
         public static Dictionary<string,(Action<Node[]> act, string delimStart, string delimEnd)> keywords = new Dictionary<string, (Action<Node[]> act, string delimStart, string delimEnd)>() //Keywords and their functions
         {
             {"print",(PrintStatement,"(",")")}, //print(expression)
+            {"input",(InputStatement,"(",")")}, //input(variable to assign to)
             {"int",(CreateInt," "," ")}, //int var
             {"float",(CreateDecimal," "," ")}, //float var
             {"string",(CreateString," "," ")}, //string var
@@ -24,6 +25,10 @@ namespace Keywords //File for keywords and built in functions/statements
             switch(statementName)
             {
                 case "print":
+                    {
+                        return SimpleStatementDelim(statementName, items);
+                    }
+                case "input":
                     {
                         return SimpleStatementDelim(statementName, items);
                     }
@@ -107,11 +112,34 @@ namespace Keywords //File for keywords and built in functions/statements
 
         private static void PrintStatement(Node[] nodeInput) //Print the appropriate value to console
         {
-            if(nodeInput.Count() > 1 || nodeInput[0].contents.GetType() == typeof(TypeTemplate.Identifier) && !Interpreter.Interpreter.globalVars.Contains(nodeInput[0].contents.ToString()))
+            if(nodeInput.Count() > 1 || nodeInput[0].contents.GetType() == typeof(TypeTemplate.Identifier) && !Interpreter.Interpreter.globalVars.Contains(nodeInput[0].contents.ReturnShallowValue().ToString()))
             {
                 throw new Exception("Invalid parameter(s) in print function");
             }
             Console.WriteLine(nodeInput[0].contents.ReturnDeepValue()); 
+        }
+
+        private static void InputStatement(Node[] nodeInput) //Ask for input and then assign to variable
+        {
+            if (nodeInput.Count() > 1 || nodeInput[0].contents.GetType() != typeof(TypeTemplate.Identifier) || !Interpreter.Interpreter.globalVars.Contains(nodeInput[0].contents.ReturnShallowValue().ToString()))
+            {
+                throw new Exception("Invalid parameter(s) in input function");
+            }
+
+            string input = Console.ReadLine();
+
+            if (nodeInput[0].type == NodeContentType.Identifier && Interpreter.Interpreter.globalVars.Contains(nodeInput[0].contents.ReturnShallowValue()))
+            {
+                if (Item.Assignable(nodeInput[0].contents, input))
+                {
+                    Interpreter.Interpreter.globalVars.UpdateItem(nodeInput[0].contents.ReturnShallowValue(), input);//Set value into variable
+                }
+            }
+            else
+            {
+                throw new Exception("Unknown variable '" + nodeInput[0].contents.ReturnShallowValue() + "'");
+            }
+
         }
 
         //Variable creators
