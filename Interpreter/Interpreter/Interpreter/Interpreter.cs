@@ -7,6 +7,7 @@ using Nodes;
 using SyntaxTree;
 using TypeDef;
 using Keywords;
+using System.Linq;
 
 namespace Interpreter
 { 
@@ -30,11 +31,13 @@ namespace Interpreter
                 if (tokens.Count > 0) //If there is a set of tokens, begin building the tree
                 {
                     Tree fullTree = null;
-                    List<Node> nodeSet = new List<Node>(); //Node representation of tokens
+                    List<VariantNode> nodeSet = new List<VariantNode>(); //Node representation of tokens
 
-                    foreach (Token x in tokens) //Parse and compute
+                    List<VariantNode> iterSet = IdentifyScope(tokens); //turns the tokens into nodes and squashes scopes
+
+                    foreach (VariantNode x in iterSet) //Parse and compute
                     {
-                        if (x.type == NodeContentType.End)
+                        if (x._item.GetType() == typeof(Node) && ((Node)x._item).type == NodeContentType.End)
                         {
                             if (nodeSet.Count > 0) //Skip empty statements
                             {
@@ -53,7 +56,7 @@ namespace Interpreter
                         }
                         else
                         {
-                            nodeSet.Add(new Node(x)); //Add node to set
+                            nodeSet.Add(x); //Add node to set
                         }
                     }
 
@@ -81,32 +84,114 @@ namespace Interpreter
             }
         }
 
-        private Tree CreateCommandTree(List<Node> nodeSet)
+        //TODO add checking for non matching { and }
+        //Add handling for no contents in {}
+        private List<VariantNode> IdentifyScope(List<Token> tSet) //Turns tokens into node list and squashes scope contents into a tree
+        {
+            List<int> scopeStartPos = new List<int>();
+            List<int> scopeEndPos = new List<int>();
+            List<VariantNode> nodes = new List<VariantNode>();
+
+            for(int i = 0; i < tSet.Count;i++)
+            {
+                Token x = tSet[i];
+
+                if(x.type == NodeContentType.Bracket)
+                {
+                    if(x.contents.ToString() == "{")
+                    {
+                        scopeStartPos.Add(i);
+                    }
+                    else if(x.contents.ToString() == "}")
+                    {
+                        scopeEndPos.Add(i);
+                    }
+                }
+            }
+
+            foreach(Token x in tSet)
+            {
+                nodes.Add(new VariantNode(new Node(x)));
+            }
+
+            scopeStartPos.Reverse(); //Reverses the scope array so it starts at the final { - iterating backwards through this should allow each to find its paired }
+            foreach(int posMarker in scopeStartPos)
+            {
+                int nextPos = scopeEndPos.First(x => x > posMarker); //get the next element where there is a scope end
+                scopeEndPos.Remove(nextPos); //remove from endPos
+
+                List<VariantNode> contentNodes = nodes.GetRange(posMarker + 1, (nextPos - posMarker)-1); //Get all nodes between the two points
+                Tree scopeTree = null;
+
+                List<VariantNode> storedNodes = new List<VariantNode>(); //Nodes to be stored
+
+                foreach (VariantNode c in contentNodes) //Turn each node into an individual part of the tree
+                {
+                    if (c._item.GetType() == typeof(Node) && ((Node)(c._item)).type == NodeContentType.End) //TODO this will probably break for nested scopes since itll try and convert a variant tree into just a node
+                    {
+                        if (storedNodes.Count > 0) //Skip empty statements
+                        {
+                            Tree syntaxTree = CreateCommandTree(storedNodes); //Create tree using statements and expression data
+                            storedNodes.Clear(); //Clears the node set to allow for reallocation
+
+                            if (scopeTree == null) //If tree is not yet set
+                            {
+                                scopeTree = syntaxTree;
+                            }
+                            else //If tree exists
+                            {
+                                scopeTree.InsertAtNextCommand(syntaxTree); //Add command to tree
+                            }
+                        }
+                    }
+                    else
+                    {
+                        storedNodes.Add(c); //Add node to set
+                    }
+                }
+
+                int preCount = nodes.Count;
+                nodes.RemoveRange(posMarker + 1, (nextPos - posMarker) - 1);
+                nodes.Insert(posMarker + 1, new VariantNode(scopeTree));
+                int change = nodes.Count - preCount;
+
+                for(int i = 0; i< scopeEndPos.Count;i++)
+                {
+                    scopeEndPos[i] += change; //Adjust for changes
+                }
+            }
+
+            return nodes;
+        }
+        private Tree CreateCommandTree(List<VariantNode> nodeSet)
         {
             Queue<Node> output = new Queue<Node>();
             Queue<Node> output2 = new Queue<Node>(){ };
             Tree? branch = null;
 
-            if (nodeSet[0].type == NodeContentType.Keyword) //Check for keyword
+            if (nodeSet[0]._item.GetType() == typeof(Node) && ((Node)(nodeSet[0]._item)).type == NodeContentType.Keyword) //Check for keyword
             {
-                Node firstItem = nodeSet[0];
+                Node firstItem = ((Node)(nodeSet[0]._item));
                 nodeSet.RemoveAt(0);
 
-                (List<Node> out1, int out1c, List<Node>? out2, int? out2c) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnShallowValue(), nodeSet); //Returns only the nodes within the parameters
-                output = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.out1); //Convert to postfix
+                (List<VariantNode> out1, int out1c, Tree out2) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnShallowValue(), nodeSet); //Returns only the nodes within the parameters
+                output = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.out1.Select(y=>((Node)y._item)).ToList()); //Convert to postfix
                 output.Enqueue(firstItem); //Apply statement token
                 nodeSet.RemoveRange(0, containingExpression.out1c);
 
                 if(containingExpression.out2 != null)
                 {
-                    branch = CreateCommandTree(containingExpression.out2);
+                    branch = containingExpression.out2;
                 }
+            }
+            else if(nodeSet[0]._item.GetType() == typeof(Node))
+            {
+                output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet.Select(y => ((Node)y._item)).ToList()); //Convert to postfix
+                nodeSet.Clear();
             }
             else
             {
-                output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet); //Convert to postfix
-                nodeSet.Clear();
-
+                throw new Exception("Error occured while trying to create a command tree");
             }
 
             output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
