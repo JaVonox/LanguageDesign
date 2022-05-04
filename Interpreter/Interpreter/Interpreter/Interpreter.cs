@@ -12,8 +12,7 @@ namespace Interpreter
 { 
     //KNOWN ISSUES
     //FINAL LINE DOESNT REQUIRE ; 
-    //NOT HAVING ; AT LINE END PRODUCES STRANGE RESULTS
-    //NEED A WAY TO DO LIKE INT A = 2;
+    //NOT HAVING ; AT LINE END PRODUCES STRANGE RESULTS - IF THERE IS A ; IN A WHILE STATEMENT IT BREAKS
     //string variables currently accept assignment like foobar = 1, creating a variable with value "1". This may need fixing.
 
     //Its possible to have more than one keyword or = in a statement. remove this.
@@ -86,6 +85,8 @@ namespace Interpreter
         {
             Queue<Node> output = new Queue<Node>();
             Queue<Node> output2 = new Queue<Node>(){ };
+            Tree? branch = null;
+
             if (nodeSet[0].type == NodeContentType.Keyword) //Check for keyword
             {
                 Node firstItem = nodeSet[0];
@@ -98,8 +99,7 @@ namespace Interpreter
 
                 if(containingExpression.out2 != null)
                 {
-                    output2 = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.out2); //Convert to postfix
-                    nodeSet.RemoveRange(0, (int)containingExpression.out2c);
+                    branch = CreateCommandTree(containingExpression.out2);
                 }
             }
             else
@@ -111,17 +111,15 @@ namespace Interpreter
 
             output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
 
-            if (nodeSet.Count > 0)
+            if (nodeSet.Count > 0 && branch == null)
             {
                 throw new Exception("Syntax error - functions must encapsulate all code in a statement"); //Maybe TODO? this checks for code outside an expression or statement.
             }
 
             Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
 
-            if(output2.Count > 0)
+            if(branch != null)
             {
-                Tree branch = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output2); //Produce branch to append to tree
-
                 ((Tree)(syntaxTree.nodes[1]._item)).nodes[0] = new VariantNode(branch); //Adds the branch to the item at index 0 with the keyword
             }
 
