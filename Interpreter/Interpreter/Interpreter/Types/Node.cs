@@ -243,41 +243,49 @@ namespace Nodes
 
             return formatIn;
         }
-        public Node? CalculateTreeResult(ref int line)
+        public Node? CalculateTreeResult()
         {
-            Node? leftValue = null;
-            Node? rightValue = null;
+            VariantNode leftValue = null;
+            VariantNode rightValue = null;
+            bool isConditional = myNode.type == NodeContentType.Keyword && (myNode.contents.ReturnShallowValue() == "while"); //Stops the tree being calculated prematurely for conditional keywords
 
             if (nodes[0] != null)
             {
-                if (nodes[0]._item.GetType() == typeof(Node))
+                if (isConditional) //if this is a conditional operation, the first item will contain the tree for when the condition is true
                 {
-                    leftValue = new Node((Node)(nodes[0]._item)); //Get node value
+                    leftValue = nodes[0];
+                }
+                else if (nodes[0]._item.GetType() == typeof(Node))
+                {
+                    leftValue = new VariantNode(new Node((Node)(nodes[0]._item))); //Get node value
                 }
                 else
                 {
-                    leftValue = new Node(((Tree)(nodes[0]._item)).CalculateTreeResult(ref line)); //Get tree result from this item
+                    leftValue = new VariantNode(new Node(((Tree)(nodes[0]._item)).CalculateTreeResult())); //Get tree result from this item
                 }
             }
 
             if (nodes[1] != null)
             {
-                if (nodes[1]._item.GetType() == typeof(Node))
+                if (isConditional) //if this is a conditional operation, the first item will contain the conditional check
                 {
-                    rightValue = new Node((Node)(nodes[1]._item)); //Get node value
+                    rightValue = nodes[1];
+                }
+                else if (nodes[1]._item.GetType() == typeof(Node) || isConditional)
+                {
+                    rightValue = new VariantNode((Node)(nodes[1]._item)); //Get node value
                 }
                 else
                 {
-                    rightValue = new Node(((Tree)(nodes[1]._item)).CalculateTreeResult(ref line)); //Get tree result from this item
+                    rightValue = new VariantNode(((Tree)(nodes[1]._item)).CalculateTreeResult()); //Get tree result from this item
                 }
             }
 
             if (myNode.type == NodeContentType.End && (leftValue == null || rightValue == null))
             {
-                line++;
                 if(nodes.Count > 2) //If there are more commands to process
                 {
-                    return new Node(((Tree)(nodes[2]._item)).CalculateTreeResult(ref line)); //Process the next command in the set
+                    return new Node(((Tree)(nodes[2]._item)).CalculateTreeResult()); //Process the next command in the set
                 }
                 else
                 {
@@ -286,12 +294,14 @@ namespace Nodes
             }
             else if(myNode.type == NodeContentType.Keyword)
             {
-                Keywords.Keywords.RouteStatement(myNode.contents.ReturnShallowValue(), new Node[]{leftValue, rightValue});
+                Keywords.Keywords.RouteStatement(myNode.contents.ReturnShallowValue(), new VariantNode[]{leftValue, rightValue});
                 return myNode;
             }
             else if(leftValue != null || rightValue != null) //Operator
             {
-                return OperatorInteractions.Interact(leftValue, rightValue, myNode); //Use operator to calculate result of the query
+                Node? leftV = leftValue != null ? ((Node?)leftValue._item) : null;
+                Node? rightV = rightValue != null ? ((Node?)rightValue._item) : null;
+                return OperatorInteractions.Interact(leftV, rightV, myNode); //Use operator to calculate result of the query
             }
             else
             {

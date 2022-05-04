@@ -12,6 +12,7 @@ namespace Parsing
         private static Dictionary<string, int> opToPriority = new Dictionary<string, int>()
         {
             {"(",-1},
+            {"{",-1 },
             {"!",1 },
             {"/",2},
             {"*",2 },
@@ -71,6 +72,28 @@ namespace Parsing
                                 else
                                 {
                                     tQueue.Enqueue(opStack.Pop());
+                                }
+                            }
+                        }
+                        else 
+                        {
+                            if (t.contents.GetStringContents() == "{")
+                            {
+                                opStack.Push(t);
+                            }
+                            else if (t.contents.GetStringContents() == "}")
+                            {
+                                while (opStack.Count > 0)
+                                {
+                                    if (opStack.Peek().type == NodeContentType.Bracket && opStack.Peek().contents.GetStringContents() == "(") //Iterate through until finding a left bracket
+                                    {
+                                        opStack.Pop();
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        tQueue.Enqueue(opStack.Pop());
+                                    }
                                 }
                             }
                         }

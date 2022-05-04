@@ -507,7 +507,7 @@ namespace Tokens
         }
         public static bool IsBrackets(string stringSet)
         {
-            return (stringSet == "(" || stringSet == ")");
+            return (stringSet == "(" || stringSet == ")" || stringSet == "{" || stringSet == "}");
         }
         public static bool IsEndStatement(char newChar, ref List<char?> delimChars) //Check for ; if ; is not expected
         {

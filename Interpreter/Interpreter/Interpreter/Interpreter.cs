@@ -15,7 +15,6 @@ namespace Interpreter
     //NOT HAVING ; AT LINE END PRODUCES STRANGE RESULTS
     //NEED A WAY TO DO LIKE INT A = 2;
     //string variables currently accept assignment like foobar = 1, creating a variable with value "1". This may need fixing.
-    //Input cannot be a statement because it returns a value
 
     //Its possible to have more than one keyword or = in a statement. remove this.
     class Interpreter
@@ -65,7 +64,7 @@ namespace Interpreter
                     }
 
                     line = 1;
-                    Node? resultSyn = fullTree.CalculateTreeResult(ref line); //Calculate from tree
+                    Node? resultSyn = fullTree.CalculateTreeResult(); //Calculate from tree
 
 
                 }
@@ -78,7 +77,7 @@ namespace Interpreter
                 }
                 else
                 {
-                    Console.WriteLine("Error on statement " + line + ": " + ex.Message);
+                    Console.WriteLine("Error : " + ex.Message);
                 }
             }
         }
@@ -86,20 +85,28 @@ namespace Interpreter
         private Tree CreateCommandTree(List<Node> nodeSet)
         {
             Queue<Node> output = new Queue<Node>();
+            Queue<Node> output2 = new Queue<Node>(){ };
             if (nodeSet[0].type == NodeContentType.Keyword) //Check for keyword
             {
                 Node firstItem = nodeSet[0];
                 nodeSet.RemoveAt(0);
 
-                (List<Node> n, int count) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnShallowValue(), nodeSet); //Returns only the nodes within the parameters
-                output = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.n); //Convert to postfix
+                (List<Node> out1, int out1c, List<Node>? out2, int? out2c) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnShallowValue(), nodeSet); //Returns only the nodes within the parameters
+                output = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.out1); //Convert to postfix
                 output.Enqueue(firstItem); //Apply statement token
-                nodeSet.RemoveRange(0, containingExpression.count);
+                nodeSet.RemoveRange(0, containingExpression.out1c);
+
+                if(containingExpression.out2 != null)
+                {
+                    output2 = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.out2); //Convert to postfix
+                    nodeSet.RemoveRange(0, (int)containingExpression.out2c);
+                }
             }
             else
             {
                 output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet); //Convert to postfix
                 nodeSet.Clear();
+
             }
 
             output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
@@ -110,6 +117,13 @@ namespace Interpreter
             }
 
             Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
+
+            if(output2.Count > 0)
+            {
+                Tree branch = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output2); //Produce branch to append to tree
+
+                ((Tree)(syntaxTree.nodes[1]._item)).nodes[0] = new VariantNode(branch); //Adds the branch to the item at index 0 with the keyword
+            }
 
             return syntaxTree;
         }
