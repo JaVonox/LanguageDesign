@@ -8,10 +8,19 @@ class MainFile
     static void Main(string[] args)
     {
         Console.WriteLine(":c interpreter initialised. Running script from CodeFile.txt");
-        string dirPath = System.AppDomain.CurrentDomain.BaseDirectory + "/CodeFile.txt";
-        string input = String.Join(" ",System.IO.File.ReadAllLines(dirPath)); //Read all lines
+        Console.WriteLine("Loading script CodeFile.txt from directory: " + System.AppDomain.CurrentDomain.BaseDirectory + "CodeFile.txt");
 
-        interpreter = new Interpreter.Interpreter(input);
+        try
+        {
+            string dirPath = System.AppDomain.CurrentDomain.BaseDirectory + "/CodeFile.txt";
+            string input = String.Join(" ", System.IO.File.ReadAllLines(dirPath)); //Read all lines
+
+            interpreter = new Interpreter.Interpreter(input);
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine("An error occured while reading the code file. are you sure there is a file named CodeFile.txt in directory " + System.AppDomain.CurrentDomain.BaseDirectory + "?");
+        }
     }
 }
 

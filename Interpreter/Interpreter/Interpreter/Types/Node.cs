@@ -247,7 +247,7 @@ namespace Nodes
         {
             VariantNode leftValue = null;
             VariantNode rightValue = null;
-            bool isConditional = myNode.type == NodeContentType.Keyword && (myNode.contents.ReturnShallowValue() == "while"); //Stops the tree being calculated prematurely for conditional keywords
+            bool isConditional = myNode.type == NodeContentType.Keyword && (myNode.contents.ReturnShallowValue() == "while" || myNode.contents.ReturnShallowValue() == "if"); //Stops the tree being calculated prematurely for conditional keywords
 
             if (nodes[0] != null)
             {

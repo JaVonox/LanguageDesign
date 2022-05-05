@@ -14,6 +14,7 @@ namespace Keywords //File for keywords and built in functions/statements
             {"print",(PrintStatement,"(",")",null,null)}, //print(expression)
             {"input",(InputStatement,"(",")",null,null)}, //input(variable to assign to)
             {"while",(WhileStatement,"(",")","{","}")}, //while(condition){commands}
+            {"if",(IfStatement,"(",")","{","}")}, //if(condition){commands}
             {"int",(CreateInt," "," ",null,null)}, //int var
             {"float",(CreateDecimal," "," ",null,null)}, //float var
             {"string",(CreateString," "," ",null,null)}, //string var
@@ -34,6 +35,10 @@ namespace Keywords //File for keywords and built in functions/statements
                         return SimpleStatementDelim(statementName, items);
                     }
                 case "while":
+                    {
+                        return SimpleStatementDelim(statementName, items);
+                    }
+                case "if":
                     {
                         return SimpleStatementDelim(statementName, items);
                     }
@@ -155,23 +160,55 @@ namespace Keywords //File for keywords and built in functions/statements
                 throw new Exception("Invalid parameter(s) in while function");
             }
 
-            while(true)
+            while (true)
             {
-                Node? condTreeResult = ((Tree)(nodeInput[1]._item)).CalculateTreeResult();
-
-                if(condTreeResult == null || condTreeResult.contents.ReturnDeepVarType() != typeof(TypeDef.TypeTemplate.Boolean))
-                {
-                    throw new Exception("Invalid condition in while function");
-                }
-
-                if (!Convert.ToBoolean(condTreeResult.contents.ReturnDeepValue())) { break; }
-                else
+                if (IsCondition(nodeInput[1]))
                 {
                     ((Tree)(nodeInput[0]._item)).CalculateTreeResult();
+                }
+                else
+                {
+                    break;
                 }
             }
         }
 
+        private static void IfStatement(VariantNode[] nodeInput) //Run contents of node 0 if node 1 is correct
+        {
+            if (nodeInput.Count() != 2)
+            {
+                throw new Exception("Invalid parameter(s) in if function");
+            }
+
+            if (IsCondition(nodeInput[1]))
+            {
+                ((Tree)(nodeInput[0]._item)).CalculateTreeResult();
+            }
+        }
+
+        private static bool IsCondition(VariantNode conditional)
+        {
+            if (conditional._item.GetType() == typeof(Tree)) //Tree type
+            {
+                Node? condTreeResult = ((Tree)(conditional._item)).CalculateTreeResult();
+
+                if (condTreeResult == null || condTreeResult.contents.ReturnDeepVarType() != typeof(TypeDef.TypeTemplate.Boolean))
+                {
+                    throw new Exception("Invalid condition in while function");
+                }
+                if (!Convert.ToBoolean(condTreeResult.contents.ReturnDeepValue())) { return false; }
+                else { return true; }
+            }
+            else //Node type
+            {
+                if (conditional == null || ((Node)(conditional._item)).contents.ReturnDeepVarType() != typeof(TypeDef.TypeTemplate.Boolean))
+                {
+                    throw new Exception("Invalid condition in while function");
+                }
+                if (!Convert.ToBoolean(((Node)(conditional._item)).contents.ReturnDeepValue())) { return false; }
+                else { return true; }
+            }
+        }
         private static void InputStatement(VariantNode[] nodeInput) //Ask for input and then assign to variable
         {
             if (nodeInput.Count() > 1 || ((Node)(nodeInput[0]._item)).contents.GetType() != typeof(TypeTemplate.Identifier) || !Interpreter.Interpreter.globalVars.Contains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))

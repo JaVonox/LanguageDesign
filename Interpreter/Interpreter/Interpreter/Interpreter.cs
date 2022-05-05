@@ -79,9 +79,12 @@ namespace Interpreter
                 }
                 else
                 {
-                    Console.WriteLine("Error : " + ex.Message);
+                    Console.WriteLine("Error: " + ex.Message);
                 }
             }
+
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadLine();
         }
 
         //TODO add checking for non matching { and }
@@ -157,7 +160,10 @@ namespace Interpreter
 
                 for(int i = 0; i< scopeEndPos.Count;i++)
                 {
-                    scopeEndPos[i] += change; //Adjust for changes
+                    if (scopeEndPos[i] > nextPos)
+                    {
+                        scopeEndPos[i] += change; //Adjust for changes
+                    }
                 }
             }
 
