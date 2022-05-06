@@ -26,29 +26,44 @@ namespace Nodes
     public class LoadedVariables //Variables
     {
         public static Dictionary<string, Item> variables = new Dictionary<string, Item>() {};
-        public bool Contains(string name)
+        public static Dictionary<string, Tree> function = new Dictionary<string, Tree>() { };
+        public bool VarContains(string name)
         {
             return variables.ContainsKey(name);
         }
-        public bool Contains(Item item)
+        public bool VarContains(Item item)
         {
             return variables.Values.Contains(item);
         }
 
-        public Item GetItem(string name)
+        public Item VarGetItem(string name)
         {
             return variables[name];
         }
-        public void UpdateItem(string name, object contents) //Need to add type checking TODO
+        public void VarUpdateItem(string name, object contents) //Need to add type checking TODO
         {
             variables[name] = new Item(Node.contentRef[variables[name].GetType()], contents);
         }
-        public Item AddNewItem(string name, Item contents) //Add new variable and return the newly created variable ref
+        public Item VarAddNewItem(string name, Item contents) //Add new variable and return the newly created variable ref
         {
-            if (Node.IsKeyword(name)) { throw new Exception("Invalid variable name"); }
+            if (Node.IsKeyword(name) || variables.ContainsKey(name) || function.ContainsKey(name)) { throw new Exception("Invalid variable name"); }
             Item newItem = new Item(Node.contentRef[contents.GetType()], contents.ReturnDeepValue());
             variables.Add(name, newItem);
             return variables[name];
+        }
+
+        public bool FuncContains(string name)
+        {
+            return function.ContainsKey(name);
+        }
+        public Tree FuncGetTree(string name)
+        {
+            return function[name];
+        }
+        public void FuncAddNewItem(string name, Tree contents) //Add new variable and return the newly created variable ref
+        {
+            if (Node.IsKeyword(name) || variables.ContainsKey(name) || function.ContainsKey(name)) { throw new Exception("Invalid function name"); }
+            function.Add(name, contents);
         }
     }
 
@@ -128,9 +143,9 @@ namespace Nodes
         {
             if(typing == NodeContentType.Identifier) //Check if variable
             {
-                if(Interpreter.Interpreter.globalVars.Contains(name) && !Keywords.Keywords.keywords.ContainsKey(name))
+                if(Interpreter.Interpreter.globalVars.VarContains(name) && !Keywords.Keywords.keywords.ContainsKey(name))
                 {
-                    contents = Interpreter.Interpreter.globalVars.GetItem(name);
+                    contents = Interpreter.Interpreter.globalVars.VarGetItem(name);
                     type = contentRef[contents.GetType()];
                     return true;
                 }
@@ -246,7 +261,7 @@ namespace Nodes
         {
             VariantNode leftValue = null;
             VariantNode rightValue = null;
-            bool isConditional = myNode.type == NodeContentType.Keyword && (myNode.contents.ReturnShallowValue() == "while" || myNode.contents.ReturnShallowValue() == "if"); //Stops the tree being calculated prematurely for conditional keywords
+            bool isConditional = myNode.type == NodeContentType.Keyword && (myNode.contents.ReturnShallowValue() == "while" || myNode.contents.ReturnShallowValue() == "if" || myNode.contents.ReturnShallowValue() == "func"); //Stops the tree being calculated prematurely for conditional keywords
 
             if (nodes[0] != null)
             {

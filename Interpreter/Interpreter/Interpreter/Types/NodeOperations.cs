@@ -56,7 +56,7 @@ namespace NodeOperations
                         producedItem = Item.Not(lNode.contents);
                         break;
                     case "=":
-                        if(lNode.type == NodeContentType.Identifier && Interpreter.Interpreter.globalVars.Contains(lNode.contents.ReturnShallowValue()))
+                        if(lNode.type == NodeContentType.Identifier && Interpreter.Interpreter.globalVars.VarContains(lNode.contents.ReturnShallowValue()))
                         {
                             Item.SetContent(lNode.contents, rNode.contents);
                         }

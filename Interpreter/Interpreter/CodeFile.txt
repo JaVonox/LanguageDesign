@@ -1,0 +1,15 @@
+func(aaa)
+{
+a = a + 1;
+print(a);
+if(a < 10)
+{
+call(aaa);
+};
+
+};
+
+int a;
+a = 1;
+
+call(a + 1);

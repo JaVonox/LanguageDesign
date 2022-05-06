@@ -12,9 +12,9 @@ namespace TypeDef
 
         public dynamic ReturnDeepValue() //Return the true value of an item - variable contents or real value
         {
-            if (GetType() == typeof(TypeTemplate.Identifier) && Interpreter.Interpreter.globalVars.Contains(content.contents.ToString()))
+            if (GetType() == typeof(TypeTemplate.Identifier) && Interpreter.Interpreter.globalVars.VarContains(content.contents.ToString()))
             {
-                return Interpreter.Interpreter.globalVars.GetItem(content.contents.ToString()).ReturnShallowValue(); //Get the contents of the item
+                return Interpreter.Interpreter.globalVars.VarGetItem(content.contents.ToString()).ReturnShallowValue(); //Get the contents of the item
             }
             else
             {
@@ -24,9 +24,9 @@ namespace TypeDef
 
         public Item ReturnDeepVar() //Returns the variable contained within a variable
         {
-            if (GetType() == typeof(TypeTemplate.Identifier) && Interpreter.Interpreter.globalVars.Contains(content.contents.ToString()))
+            if (GetType() == typeof(TypeTemplate.Identifier) && Interpreter.Interpreter.globalVars.VarContains(content.contents.ToString()))
             {
-                return Interpreter.Interpreter.globalVars.GetItem(content.contents.ToString()); //Get the contents of the item
+                return Interpreter.Interpreter.globalVars.VarGetItem(content.contents.ToString()); //Get the contents of the item
             }
             else
             {
@@ -36,9 +36,9 @@ namespace TypeDef
 
         public Type ReturnDeepVarType()
         {
-            if (GetType() == typeof(TypeTemplate.Identifier) && Interpreter.Interpreter.globalVars.Contains(content.contents.ToString()))
+            if (GetType() == typeof(TypeTemplate.Identifier) && Interpreter.Interpreter.globalVars.VarContains(content.contents.ToString()))
             {
-                return Interpreter.Interpreter.globalVars.GetItem(content.contents.ToString()).GetType(); //Get the contents of the item
+                return Interpreter.Interpreter.globalVars.VarGetItem(content.contents.ToString()).GetType(); //Get the contents of the item
             }
             else
             {
@@ -141,9 +141,9 @@ namespace TypeDef
         {
             if (item.GetType() == typeof(TypeTemplate.Identifier))
             {
-                if (Interpreter.Interpreter.globalVars.Contains(item.ReturnShallowValue()))
+                if (Interpreter.Interpreter.globalVars.VarContains(item.ReturnShallowValue()))
                 {
-                    item = Interpreter.Interpreter.globalVars.GetItem(item.ReturnShallowValue());
+                    item = Interpreter.Interpreter.globalVars.VarGetItem(item.ReturnShallowValue());
                 }
                 else
                 {
@@ -229,15 +229,15 @@ namespace TypeDef
             GetVariable(ref self);
             return self.content.Not(self);
         }
-        public static void SetContent(Item self, Item newContents) //TODO add type checking
+        public static void SetContent(Item self, Item newContents)
         {
             if (self.GetType() == typeof(TypeTemplate.Identifier))
             {
-                if (Interpreter.Interpreter.globalVars.Contains(self.ReturnShallowValue()))
+                if (Interpreter.Interpreter.globalVars.VarContains(self.ReturnShallowValue()))
                 {
                     if (self.ReturnDeepVar().content.CanAssign(newContents.ReturnDeepValue())) //Check if the variable types are compatible
                     {
-                        Interpreter.Interpreter.globalVars.UpdateItem(self.ReturnShallowValue(), newContents.ReturnDeepValue()); //Set the value in the variable storage
+                        Interpreter.Interpreter.globalVars.VarUpdateItem(self.ReturnShallowValue(), newContents.ReturnDeepValue()); //Set the value in the variable storage
                     }
                     else
                     {

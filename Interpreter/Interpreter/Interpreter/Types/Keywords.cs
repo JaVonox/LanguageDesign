@@ -15,6 +15,8 @@ namespace Keywords //File for keywords and built in functions/statements
             {"input",(InputStatement,"(",")",null,null)}, //input(variable to assign to)
             {"while",(WhileStatement,"(",")","{","}")}, //while(condition){commands}
             {"if",(IfStatement,"(",")","{","}")}, //if(condition){commands}
+            {"func",(FuncStatement,"(",")","{","}")}, //func(name){commands}
+            {"call",(CallFuncStatement,"(",")",null,null)}, //call(funcname)
             {"int",(CreateInt," "," ",null,null)}, //int var
             {"float",(CreateDecimal," "," ",null,null)}, //float var
             {"string",(CreateString," "," ",null,null)}, //string var
@@ -39,6 +41,14 @@ namespace Keywords //File for keywords and built in functions/statements
                         return SimpleStatementDelim(statementName, items);
                     }
                 case "if":
+                    {
+                        return SimpleStatementDelim(statementName, items);
+                    }
+                case "func":
+                    {
+                        return SimpleStatementDelim(statementName, items);
+                    }
+                case "call":
                     {
                         return SimpleStatementDelim(statementName, items);
                     }
@@ -147,7 +157,7 @@ namespace Keywords //File for keywords and built in functions/statements
 
         private static void PrintStatement(VariantNode[] nodeInput) //Print the appropriate value to console
         {
-            if(nodeInput.Count() > 1 || ((Node)(nodeInput[0]._item)).contents.GetType() == typeof(TypeTemplate.Identifier) && !Interpreter.Interpreter.globalVars.Contains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))
+            if(nodeInput.Count() > 1 || ((Node)(nodeInput[0]._item)).contents.GetType() == typeof(TypeTemplate.Identifier) && !Interpreter.Interpreter.globalVars.VarContains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))
             {
                 throw new Exception("Invalid parameter(s) in print function");
             }
@@ -186,6 +196,54 @@ namespace Keywords //File for keywords and built in functions/statements
             }
         }
 
+        private static void FuncStatement(VariantNode[] nodeInput) //Store tree of node 0 in identifier of node 1
+        {
+            if (nodeInput.Count() != 2)
+            {
+                throw new Exception("Invalid parameter(s) in function declaration");
+            }
+
+            if(nodeInput[1]._item.GetType() != typeof(Node))
+            {
+                throw new Exception("Invalid name for function");
+            }
+            if(nodeInput[0]._item.GetType() != typeof(Tree))
+            {
+                throw new Exception("Invalid function contents");
+            }
+
+            string name = ((Node)(nodeInput[1]._item)).contents.ReturnShallowValue();
+            if (((Node)(nodeInput[1]._item)).type != NodeContentType.Identifier) { throw new Exception("Invalid function name: " + name); }
+
+            if (Interpreter.Interpreter.globalVars.FuncContains(name))
+            {
+                throw new Exception("Redeclaration of function " + name);
+            }
+            else
+            {
+                Interpreter.Interpreter.globalVars.FuncAddNewItem(name, (Tree)(nodeInput[0]._item));
+            }
+        }
+        private static void CallFuncStatement(VariantNode[] nodeInput) //Run the func specified in nodeInput[0]
+        {
+            if (nodeInput.Count() != 1)
+            {
+                throw new Exception("Invalid parameter(s) in function call function ");
+            }
+            else if(((Node)(nodeInput[0]._item)).contents.GetType() != typeof(TypeTemplate.Identifier))
+            {
+                throw new Exception("Function calls must use an identifier");
+            }
+            else if(((Node)(nodeInput[0]._item)).contents.GetType() == typeof(TypeTemplate.Identifier) && !Interpreter.Interpreter.globalVars.FuncContains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))
+            {
+                throw new Exception("Unknown function: " + ((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString());
+            }
+
+            string name = ((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString();
+
+            Interpreter.Interpreter.globalVars.FuncGetTree(name).CalculateTreeResult(); //Run function
+        }
+
         private static bool IsCondition(VariantNode conditional)
         {
             if (conditional._item.GetType() == typeof(Tree)) //Tree type
@@ -194,7 +252,7 @@ namespace Keywords //File for keywords and built in functions/statements
 
                 if (condTreeResult == null || condTreeResult.contents.ReturnDeepVarType() != typeof(TypeDef.TypeTemplate.Boolean))
                 {
-                    throw new Exception("Invalid condition in while function");
+                    throw new Exception("Invalid condition in function");
                 }
                 if (!Convert.ToBoolean(condTreeResult.contents.ReturnDeepValue())) { return false; }
                 else { return true; }
@@ -203,7 +261,7 @@ namespace Keywords //File for keywords and built in functions/statements
             {
                 if (conditional == null || ((Node)(conditional._item)).contents.ReturnDeepVarType() != typeof(TypeDef.TypeTemplate.Boolean))
                 {
-                    throw new Exception("Invalid condition in while function");
+                    throw new Exception("Invalid condition in function");
                 }
                 if (!Convert.ToBoolean(((Node)(conditional._item)).contents.ReturnDeepValue())) { return false; }
                 else { return true; }
@@ -211,18 +269,18 @@ namespace Keywords //File for keywords and built in functions/statements
         }
         private static void InputStatement(VariantNode[] nodeInput) //Ask for input and then assign to variable
         {
-            if (nodeInput.Count() > 1 || ((Node)(nodeInput[0]._item)).contents.GetType() != typeof(TypeTemplate.Identifier) || !Interpreter.Interpreter.globalVars.Contains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))
+            if (nodeInput.Count() > 1 || ((Node)(nodeInput[0]._item)).contents.GetType() != typeof(TypeTemplate.Identifier) || !Interpreter.Interpreter.globalVars.VarContains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))
             {
                 throw new Exception("Invalid parameter(s) in input function");
             }
 
             string input = Console.ReadLine();
 
-            if (((Node)(nodeInput[0]._item)).type == NodeContentType.Identifier && Interpreter.Interpreter.globalVars.Contains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue()))
+            if (((Node)(nodeInput[0]._item)).type == NodeContentType.Identifier && Interpreter.Interpreter.globalVars.VarContains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue()))
             {
                 if (Item.Assignable(((Node)(nodeInput[0]._item)).contents, input))
                 {
-                    Interpreter.Interpreter.globalVars.UpdateItem(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue(), input);//Set value into variable
+                    Interpreter.Interpreter.globalVars.VarUpdateItem(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue(), input);//Set value into variable
                 }
             }
             else
@@ -241,13 +299,13 @@ namespace Keywords //File for keywords and built in functions/statements
         private static void CreateNewVar(Node newItem, NodeContentType type)
         {
             if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable name: " + newItem.contents.ReturnShallowValue()); }
-            if (Interpreter.Interpreter.globalVars.Contains(newItem.contents.ReturnShallowValue()))
+            if (Interpreter.Interpreter.globalVars.VarContains(newItem.contents.ReturnShallowValue()))
             {
                 throw new Exception("Redeclaration of variable " + newItem.contents.ReturnShallowValue());
             }
             else
             {
-                Interpreter.Interpreter.globalVars.AddNewItem(newItem.contents.ReturnShallowValue(), new Item(type, null));
+                Interpreter.Interpreter.globalVars.VarAddNewItem(newItem.contents.ReturnShallowValue(), new Item(type, null));
             }
         }
     }
