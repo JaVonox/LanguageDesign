@@ -5,6 +5,7 @@ using Nodes;
 using TypeDef;
 using Interpreter;
 using System.Linq;
+
 namespace Keywords //File for keywords and built in functions/statements
 {
     public static class Keywords
@@ -17,6 +18,7 @@ namespace Keywords //File for keywords and built in functions/statements
             {"if",(IfStatement,"(",")","{","}")}, //if(condition){commands}
             {"func",(FuncStatement,"(",")","{","}")}, //func(name){commands}
             {"call",(CallFuncStatement,"(",")",null,null)}, //call(funcname)
+            {"rnd",(RandFunction,"(",")",null,null)}, //rnd(variable to assign to)
             {"int",(CreateInt," "," ",null,null)}, //int var
             {"float",(CreateDecimal," "," ",null,null)}, //float var
             {"string",(CreateString," "," ",null,null)}, //string var
@@ -49,6 +51,10 @@ namespace Keywords //File for keywords and built in functions/statements
                         return SimpleStatementDelim(statementName, items);
                     }
                 case "call":
+                    {
+                        return SimpleStatementDelim(statementName, items);
+                    }
+                case "rnd":
                     {
                         return SimpleStatementDelim(statementName, items);
                     }
@@ -281,6 +287,29 @@ namespace Keywords //File for keywords and built in functions/statements
                 if (Item.Assignable(((Node)(nodeInput[0]._item)).contents, input))
                 {
                     Interpreter.Interpreter.globalVars.VarUpdateItem(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue(), input);//Set value into variable
+                }
+            }
+            else
+            {
+                throw new Exception("Unknown variable '" + ((Node)(nodeInput[0]._item)).contents.ReturnShallowValue() + "'");
+            }
+
+        }
+
+        private static void RandFunction(VariantNode[] nodeInput) //Ask for input and then assign to variable
+        {
+            if (nodeInput.Count() > 1 || ((Node)(nodeInput[0]._item)).contents.GetType() != typeof(TypeTemplate.Identifier) || !Interpreter.Interpreter.globalVars.VarContains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))
+            {
+                throw new Exception("Invalid parameter(s) in rnd function. Please enter a variable name to store the random decimal value in.");
+            }
+
+            string rndVal = ((float)(MainFile.rand.NextDouble())).ToString();
+
+            if (((Node)(nodeInput[0]._item)).type == NodeContentType.Identifier && Interpreter.Interpreter.globalVars.VarContains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue()))
+            {
+                if (Item.Assignable(((Node)(nodeInput[0]._item)).contents, rndVal))
+                {
+                    Interpreter.Interpreter.globalVars.VarUpdateItem(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue(), rndVal);//Set value into variable
                 }
             }
             else

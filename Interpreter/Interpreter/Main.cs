@@ -5,6 +5,7 @@ using System.Reflection;
 class MainFile
 {
     public static Interpreter.Interpreter interpreter;
+    public static Random rand = new Random(); //for rnd function
     static void Main(string[] args)
     {
         Console.WriteLine(":c interpreter initialised. Running script from CodeFile.txt");
