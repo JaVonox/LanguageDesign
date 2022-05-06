@@ -30,7 +30,6 @@ namespace Nodes
         {
             return variables.ContainsKey(name);
         }
-
         public bool Contains(Item item)
         {
             return variables.Values.Contains(item);

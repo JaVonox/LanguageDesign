@@ -12,9 +12,7 @@ using System.Linq;
 namespace Interpreter
 { 
     //KNOWN ISSUES
-    //FINAL LINE DOESNT REQUIRE ; 
-    //NOT HAVING ; AT LINE END PRODUCES STRANGE RESULTS - IF THERE IS A ; IN A WHILE STATEMENT IT BREAKS
-    //string variables currently accept assignment like foobar = 1, creating a variable with value "1". This may need fixing.
+    //INPUTS AFTER {} BEFORE ; ARE ACCEPTED BUT NOT RAN
 
     //Its possible to have more than one keyword or = in a statement. remove this.
     class Interpreter
@@ -66,6 +64,11 @@ namespace Interpreter
                     }
 
                     line = 1;
+
+                    if(fullTree == null)
+                    {
+                        throw new Exception("No code input detected");
+                    }
                     Node? resultSyn = fullTree.CalculateTreeResult(); //Calculate from tree
 
 
@@ -118,6 +121,10 @@ namespace Interpreter
             }
 
             scopeStartPos.Reverse(); //Reverses the scope array so it starts at the final { - iterating backwards through this should allow each to find its paired }
+
+            if(scopeStartPos.Count() > scopeEndPos.Count()) { throw new Exception("One or more missing }"); }
+            else if(scopeStartPos.Count() < scopeEndPos.Count()) { throw new Exception("One or more missing {"); }
+
             foreach(int posMarker in scopeStartPos)
             {
                 int nextPos = scopeEndPos.First(x => x > posMarker); //get the next element where there is a scope end
@@ -153,6 +160,11 @@ namespace Interpreter
                     }
                 }
 
+                if(scopeTree == null)
+                {
+                    throw new Exception("Empty scope parenthesis - { } must contain one or more statements");
+                }
+
                 int preCount = nodes.Count;
                 nodes.RemoveRange(posMarker + 1, (nextPos - posMarker) - 1);
                 nodes.Insert(posMarker + 1, new VariantNode(scopeTree));
@@ -171,50 +183,60 @@ namespace Interpreter
         }
         private Tree CreateCommandTree(List<VariantNode> nodeSet)
         {
-            Queue<Node> output = new Queue<Node>();
-            Queue<Node> output2 = new Queue<Node>(){ };
-            Tree? branch = null;
-
-            if (nodeSet[0]._item.GetType() == typeof(Node) && ((Node)(nodeSet[0]._item)).type == NodeContentType.Keyword) //Check for keyword
+            try
             {
-                Node firstItem = ((Node)(nodeSet[0]._item));
-                nodeSet.RemoveAt(0);
+                Queue<Node> output = new Queue<Node>();
+                Queue<Node> output2 = new Queue<Node>() { };
+                Tree? branch = null;
 
-                (List<VariantNode> out1, int out1c, Tree out2) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnShallowValue(), nodeSet); //Returns only the nodes within the parameters
-                output = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.out1.Select(y=>((Node)y._item)).ToList()); //Convert to postfix
-                output.Enqueue(firstItem); //Apply statement token
-                nodeSet.RemoveRange(0, containingExpression.out1c);
-
-                if(containingExpression.out2 != null)
+                if (nodeSet[0]._item.GetType() == typeof(Node) && ((Node)(nodeSet[0]._item)).type == NodeContentType.Keyword) //Check for keyword
                 {
-                    branch = containingExpression.out2;
+                    Node firstItem = ((Node)(nodeSet[0]._item));
+                    nodeSet.RemoveAt(0);
+
+                    (List<VariantNode> out1, int out1c, Tree out2) containingExpression = Keywords.Keywords.SubsetStatement(firstItem.contents.ReturnShallowValue(), nodeSet); //Returns only the nodes within the parameters
+                    output = Parsing.Shunting.ShuntingYardAlgorithm(containingExpression.out1.Select(y => ((Node)y._item)).ToList()); //Convert to postfix
+                    output.Enqueue(firstItem); //Apply statement token
+                    nodeSet.RemoveRange(0, containingExpression.out1c);
+
+                    if (containingExpression.out2 != null)
+                    {
+                        branch = containingExpression.out2;
+                    }
                 }
+                else if (nodeSet[0]._item.GetType() == typeof(Node))
+                {
+                    if(nodeSet.Any(x=>x._item.GetType() != typeof(Node))) { 
+                        throw new Exception("Syntax error while parsing scope. Are there any scope ({ or }) assignments outside of a function?");
+                    }
+                    output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet.Select(y => ((Node)y._item)).ToList()); //Convert to postfix
+                    nodeSet.Clear();
+                }
+                else
+                {
+                    throw new Exception("Error occured while trying to create a command tree");
+                }
+
+                output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
+
+                if (nodeSet.Count > 0 && branch == null)
+                {
+                    throw new Exception("Syntax error - functions must encapsulate all code in a statement"); //Maybe TODO? this checks for code outside an expression or statement.
+                }
+
+                Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
+
+                if (branch != null)
+                {
+                    ((Tree)(syntaxTree.nodes[1]._item)).nodes[0] = new VariantNode(branch); //Adds the branch to the item at index 0 with the keyword
+                }
+
+                return syntaxTree;
             }
-            else if(nodeSet[0]._item.GetType() == typeof(Node))
+            catch(Exception ex)
             {
-                output = Parsing.Shunting.ShuntingYardAlgorithm(nodeSet.Select(y => ((Node)y._item)).ToList()); //Convert to postfix
-                nodeSet.Clear();
+                throw new Exception(ex.Message);
             }
-            else
-            {
-                throw new Exception("Error occured while trying to create a command tree");
-            }
-
-            output.Enqueue(new Node(NodeContentType.End, ";")); //Apply end token
-
-            if (nodeSet.Count > 0 && branch == null)
-            {
-                throw new Exception("Syntax error - functions must encapsulate all code in a statement"); //Maybe TODO? this checks for code outside an expression or statement.
-            }
-
-            Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
-
-            if(branch != null)
-            {
-                ((Tree)(syntaxTree.nodes[1]._item)).nodes[0] = new VariantNode(branch); //Adds the branch to the item at index 0 with the keyword
-            }
-
-            return syntaxTree;
         }
     }
 }

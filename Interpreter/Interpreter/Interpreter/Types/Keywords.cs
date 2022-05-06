@@ -240,7 +240,7 @@ namespace Keywords //File for keywords and built in functions/statements
 
         private static void CreateNewVar(Node newItem, NodeContentType type)
         {
-            if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable declaration or redeclaration of variable " + newItem.contents.ReturnShallowValue()); }
+            if (newItem.type != NodeContentType.Identifier) { throw new Exception("Invalid variable name: " + newItem.contents.ReturnShallowValue()); }
             if (Interpreter.Interpreter.globalVars.Contains(newItem.contents.ReturnShallowValue()))
             {
                 throw new Exception("Redeclaration of variable " + newItem.contents.ReturnShallowValue());

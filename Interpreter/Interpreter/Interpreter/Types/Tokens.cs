@@ -181,7 +181,7 @@ namespace Tokens
 
                 if(data.Length == 0)
                 {
-                    throw new Exception("No Data Input");
+                    throw new Exception("No code input detected");
                 }    
 
                 for (int i = 0; i < data.Length; i++)
@@ -257,7 +257,7 @@ namespace Tokens
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Exception while producing tokens - " + ex);
+                Console.WriteLine("Exception while producing tokens - " + ex.Message);
             }
 
             foreach(Token t in tokens)
