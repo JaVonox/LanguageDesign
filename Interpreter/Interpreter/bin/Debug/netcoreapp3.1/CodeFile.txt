@@ -1,184 +1,54 @@
-float random;
-int roll;
+string movement;
+int position;
+position = 22;
 
-int player1Prog;
-int player2Prog;
-player1Prog = 1;
-player2Prog = 1;
+int scanPos;
+scanPos = 11;
 
-int maxLength;
-maxLength = 0;
+string printer;
+printer = "";
 
-while(maxLength < 15)
+while(true)
 {
-	print("Enter the course length:");
-	input(maxLength);
+	scanPos = 11;
 
-	if(maxLength < 15)
+	while(scanPos < 34)
 	{
-		print("Please enter a value of 15 or greater");
-	};
-};
+		if(position == scanPos){printer = printer + "@";};
+		if(position != scanPos){printer = printer + "#";};
 
-float floorCounter;
-func(FloorD6Roll)
-{
-	floorCounter = 0.0;
-
-	while(floorCounter < 1)
-	{
-		if(random >= floorCounter)
-		{
-			roll = roll + 1;
-		};
-
-		floorCounter = floorCounter + (1/6);
-	};
-
-	if(roll > 6)
-	{
-		roll = 6;
-	};
-
-	if(roll < 1)
-	{
-		roll = 1;
-	};
-
-	floorCounter = 0.0;
-};
-
-func(RollD6)
-{
-	roll = 0;
-
-	rnd(random);
-	call(FloorD6Roll);
-
-	random = 0.0;
-};
-
-string course;
-int iter;
-
-func(PrintMap)
-{
-	course = "";
-	iter = 1;
-
-	while(iter <= maxLength)
-	{
-		if(player1Prog == iter && player2Prog == iter)
-		{
-			course = course + "@";
-		};
-
-		if(!(player1Prog == iter && player2Prog == iter))
-		{
-			if(player1Prog == iter)
-			{
-				course = course + "1";
-			};
-
-			if(player2Prog == iter)
-			{
-				course = course + "2";
-			};
-
-			if(player1Prog != iter && player2Prog != iter)
-			{
-				if(iter != maxLength)
-				{
-					course = course + "=";
-				};
-
-				if(iter == maxLength)
-				{
-					course = course + "#";
-				};
-			};
-		};
-
-		iter = iter + 1;
-	};
-
-	print(course);
-
-};
-
-print("Starting the game...");
-print("Rules:");
-print("Get to the end of the course!");
-print("Each round each player chooses a number between 0 and 5 inclusive, then rolls a dice. If their roll is greater than the input number, then they move their roll + their expected value");
-print("If the roll is less than the expected score, the player does not move");
-print("Once a roll has been played, it switches to the other players turn");
-
-int expectedRoll;
-bool player1Turn;
-int movement;
-
-player1Turn = false;
-
-while(player1Prog < maxLength && player2Prog < maxLength)
-{
-	call(PrintMap);
-
-	player1Turn = !player1Turn;
-	movement = 0;
-	roll = 0;
-	expectedRoll = -1;
-
-	if(player1Turn)
-	{
-		print("--- Player 1 ---");
-	};
-
-	if(!player1Turn)
-	{
-		print("--- Player 2 ---");
-	};
-
-	while(expectedRoll < 0 || expectedRoll > 5)
-	{
-		print("Enter a value that you believe you will roll above - between 0 and 5 inclusive");
-		input(expectedRoll);
-
-		if(expectedRoll < 0 || expectedRoll > 5)
-		{
-			print("expected roll must be either: 0, 1, 2, 3, 4 or 5");
+		scanPos = scanPos + 1;
+		if(scanPos == 14 || scanPos == 24 || scanPos == 34){
+			scanPos = scanPos + 7;
+			print(printer);
+			printer = "";
 		};
 	};
 
-	call(RollD6);
-	print("Rolled: " + roll);
+	print("enter W for up, A for left, S for down, D for right");
+	input(movement);
 
-	if(roll > expectedRoll)
+	if(movement == "W" || movement == "w")
 	{
-		movement = roll + expectedRoll;
+		position = position - 10;
+		if(position < 10){position = position + 10;};
 	};
 
-
-	if(player1Turn)
+	if(movement == "S" || movement == "s")
 	{
-		print("Player 1 moves " + movement + " spaces!");
-		player1Prog = player1Prog + movement;
-	};
-	if(!player1Turn)
-	{
-		print("Player 2 moves " + movement + " spaces!");
-		player2Prog = player2Prog + movement;
+		position = position + 10;
+		if(position > 33){position = position - 10;};
 	};
 
-};
+	if(movement == "A" || movement == "a")
+	{
+		position = position - 1;
+		if(position == 10 || position == 20 || position == 30){position = position + 1;};
+	};
 
-call(PrintMap);
-
-if(player1Turn)
-{
-	print("Player 1 wins!");
-};
-
-if(!player1Turn)
-{
-	print("Player 2 wins!");
+	if(movement == "D" || movement == "d")
+	{
+		position = position + 1;
+		if(position == 14 || position == 24 || position == 34){position = position - 1;};
+	};
 };

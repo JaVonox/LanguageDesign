@@ -11,10 +11,6 @@ using System.Linq;
 
 namespace Interpreter
 { 
-    //KNOWN ISSUES
-    //INPUTS AFTER {} BEFORE ; ARE ACCEPTED BUT NOT RAN
-
-    //Its possible to have more than one keyword or = in a statement. remove this. STILL PROBLEM
     class Interpreter
     {
         public static LoadedVariables globalVars = new LoadedVariables(); //Global variables

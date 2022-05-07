@@ -15,6 +15,10 @@ This file will discuss the basic usage of the interpreter and the features and s
 2.5.2. input
 2.5.3. if
 2.5.4. while
+2.5.5. func
+2.5.6. call
+2.5.7. rnd
+2.6. Example Files
 
 --- 1. Startup ---
 To begin using the :c interpreter, first follow the installation steps outlined in BUILD.txt
@@ -123,15 +127,103 @@ In addition, other declared variables (given that they are of a valid type) may 
 Provided a variable has been given a value, it may also be used in the assignment of itself - such as "a = a + 10;"
 
 An = operator may not be used in any situation outside the scope of assignment - assignment composes a single statement that expects an expression, and therefore does not return any value.
-In addition to to this, multiple = operators may not be used in a single operation (with the exception of the == operation, which is distinct from the = assignment operator).
-Failure to adhere to these rules will result in an error occuring.
 
 --- 2.5. Functions ---
 :c incorporates some baseline functions to allow system flow. 
-It should be noted that each function returns no value, and is therefore not usable in an equation. 
+It should be noted that each function returns no value, and is therefore not usable in an expression. 
 Functions must be the first token in a statement, and any inputs outside their scope will cause an error.
 
-The following functions are currently implemented:
+For the following function definitions, square brackets ([ ]) are used to denote the type of input expected in an area. These brackets would not be used in a real system.
+
+--- 2.5.1. print ---
+
+print([expression]);
+
+The print function takes in an expression and displays its contents on a new line in the console.
+The expression in question may also consist of a single token. Variables may also be used as a single token or as a component of the expression.
+
+--- 2.5.2. input ---
+
+input([variable name]);
+
+The input function takes an input and stores the contents in the variable supplied. 
+Note that the input will attempt to transform into the type of the variable, and therefore invalid inputs (such as 'a' into an integer variable) will cause an error to occur
+
+--- 2.5.3. if ---
+
+if([condition expression])
+{
+	[code]
+};
+
+The if statement function will run the code encapsulated within the { } brackets if the conditional expression returns true.
+Note that, like the print function, the conditional expression may be a single token and may also include variables - but note that any inputs that do not result in a boolean output will cause errors.
+The positioning of the { } brackets do not matter aside from the fact they must occur after the conditional - it is possible to have an if statement consist of a single line.
+In addition to this, the indentation of the code block does not matter. However, the encapsulated code must be split into statements using the semicolon character as usual.
+
+Finally, it should be noted that the if statement must still end with the semicolon character.
+
+--- 2.5.4. while ---
+
+while([condition expression])
+{
+	[code]
+};
+
+Much like the prior if statement, the while statement evaluates a condition and executes a block of code if true. 
+However, when reaching the end of the block, the condition will be reevaluated and the code block will be repeated as long as the condition is true. If false, the next statement after the while clause will be executed.
+
+--- 2.5.5. func ---
+
+func([function name])
+{
+	[code]
+};
+
+The func statement defines a new function corresponding to the provided function name and stores it in global memory. 
+The contents of this function can then be executed using the call command, described below.
+It should be noted that functions are incapable of returning values and are assigned as they are parsed - meaning attempting to use a function before it has been declared will cause problems.
+
+Much like variables, function names cannot share the name of a keyword or variable. This same principle applies to variables - in that they may not share a name with a defined function.
+
+--- 2.5.6. call ---
+
+call([function name]);
+
+The call command will execute the contents of a previously defined function. 
+As mentioned in the func segment, a function will not return any output, and therefore the call function cannot be used in an expression or assignment.
+To use functions to assign values, variables can be accessed from inside a function when declared. 
+
+--- 2.5.7. rnd ---
+
+rnd([variable name]);
+
+The rnd command will generate a random decimal value between 0 and 1 and assign said value into a specified variable.
+Due to the typing of this, errors will occur if the variable specified is not of a decimal or string type.
+
+--- 2.6. Example Files ---
+
+Inside the supplied documents exists a folder called "ExampleFiles". This folder contains the five examples of the programming language - each seperated by subfolders specifying their type.
+Inside these subfolders there is a single CodeFile.txt file for each function. The contents of this CodeFile.txt can replace the CodeFile.txt file in the directory of interpreter.exe to change what software is being run.
+In order of simplicity, the following example files exist:
+
+Mixed -
+	A variety of different simple expressions and methods demonstrating the core concepts of the interpreter. 
+	
+Movement -
+	A simple top down movement system, inwhich a player is able to move around a 3x3 grid by using WASD inputs. 
+	
+BoardGame -
+	A two player board game inwhich each player attempts to travel a number of spaces before the other. 
+	Each predicts a value they will roll above (from 0 to 5) and then rolls a dice. If they roll above their expected number they will move the number on the dice plus their input.
+	If a player rolls below their expected value they will not move.
+	The first player to reach the user defined goal wins the game.
+	
+AIBlackjack -
+	A one-player blackjack game inwhich the player competes against a basic AI. 
+	It should be noted that the deck in this software is unlimited, therefore more than four of each card value can exist at once.
+	Additionally, in this software the ace is counted as a 1. When placed down this value is shown as an "A".
+	10s, Jacks, Queens and Kings have the same value of 10. Each is shown with the first letter of their spelled name - "T" for 10, "J" for jack, "Q" for queen, "K" for king.
 
 
 ----- 100505349 University of Derby -----

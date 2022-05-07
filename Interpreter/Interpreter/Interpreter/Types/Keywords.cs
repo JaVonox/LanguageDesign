@@ -234,7 +234,7 @@ namespace Keywords //File for keywords and built in functions/statements
         {
             if (nodeInput.Count() != 1)
             {
-                throw new Exception("Invalid parameter(s) in function call function ");
+                throw new Exception("Invalid parameter(s) in function call function");
             }
             else if(((Node)(nodeInput[0]._item)).contents.GetType() != typeof(TypeTemplate.Identifier))
             {
@@ -300,7 +300,7 @@ namespace Keywords //File for keywords and built in functions/statements
         {
             if (nodeInput.Count() > 1 || ((Node)(nodeInput[0]._item)).contents.GetType() != typeof(TypeTemplate.Identifier) || !Interpreter.Interpreter.globalVars.VarContains(((Node)(nodeInput[0]._item)).contents.ReturnShallowValue().ToString()))
             {
-                throw new Exception("Invalid parameter(s) in rnd function. Please enter a variable name to store the random decimal value in.");
+                throw new Exception("Invalid parameter(s) in rnd function. Please enter a valid variable name to store the random decimal value in");
             }
 
             string rndVal = ((float)(MainFile.rand.NextDouble())).ToString();
