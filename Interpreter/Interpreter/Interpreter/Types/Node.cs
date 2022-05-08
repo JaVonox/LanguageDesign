@@ -40,7 +40,7 @@ namespace Nodes
         {
             return variables[name];
         }
-        public void VarUpdateItem(string name, object contents) //Need to add type checking TODO
+        public void VarUpdateItem(string name, object contents)
         {
             variables[name] = new Item(Node.contentRef[variables[name].GetType()], contents);
         }

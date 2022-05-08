@@ -281,7 +281,7 @@ namespace TypeDef
 
         public void SetItem(Item newItem)
         {
-            contents = newItem.ReturnDeepValue(); //Set the value. TODO add type checking
+            contents = newItem.ReturnDeepValue(); 
         }
         public abstract Item AddOperation(Item self, Item ext);
         public abstract Item SubOperation(Item self, Item ext);

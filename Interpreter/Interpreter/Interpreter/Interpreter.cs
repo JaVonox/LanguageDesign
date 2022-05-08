@@ -86,8 +86,6 @@ namespace Interpreter
             Console.ReadLine();
         }
 
-        //TODO add checking for non matching { and }
-        //Add handling for no contents in {}
         private List<VariantNode> IdentifyScope(List<Token> tSet) //Turns tokens into node list and squashes scope contents into a tree
         {
             List<int> scopeStartPos = new List<int>();
@@ -133,7 +131,7 @@ namespace Interpreter
 
                 foreach (VariantNode c in contentNodes) //Turn each node into an individual part of the tree
                 {
-                    if (c._item.GetType() == typeof(Node) && ((Node)(c._item)).type == NodeContentType.End) //TODO this will probably break for nested scopes since itll try and convert a variant tree into just a node
+                    if (c._item.GetType() == typeof(Node) && ((Node)(c._item)).type == NodeContentType.End)
                     {
                         if (storedNodes.Count > 0) //Skip empty statements
                         {
@@ -217,7 +215,7 @@ namespace Interpreter
 
                 if (nodeSet.Count > 0 && branch == null)
                 {
-                    throw new Exception("Syntax error - functions must encapsulate all code in a statement"); //Maybe TODO? this checks for code outside an expression or statement.
+                    throw new Exception("Syntax error - functions must encapsulate all code in a statement"); 
                 }
 
                 Tree syntaxTree = SyntaxTree.SyntaxTreeGenerator.GenerateTree(output); //Produce tree
