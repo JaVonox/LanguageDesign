@@ -41,15 +41,24 @@ print("divide by 4 = ");
 print(xb / 4);
 print("original = ");
 print(xb);
-int iter;
-iter = 0;
-while(iter <= 10)
+
+bool is_running;
+is_running = true;
+string shopping_list;
+shopping_list = "";
+
+string item;
+while(is_running == true)
 {
-print("enter a value greater than 10");
-input(iter);
-if(iter == 10)
-{
-print("value must be greater than 10, not greater than or equal to");
+	print("add an item to the shopping list");
+	input(item);
+
+	if(item == "")
+	{
+		is_running = false;
+	};
+
+	shopping_list = shopping_list + ", " + item;
 };
-};
-print("you entered: " + iter);
+
+print(shopping_list);

@@ -1,0 +1,32 @@
+----- :c Language Build Instructions -----
+
+--- CONTENTS ---
+1. Building
+1.1. Prebuilt
+1.2. Manual Building
+
+--- 1. Building ---
+
+To use the :c interpreter, the required interpreter files must be available for use. This document will discuss how to use the pre built instance of the software or otherwise manually build the file using the source code.
+When this procedure has been complete, see the included README.txt file for setup instructions and documentation of :c language.
+
+It should be noted that the :c language is only currently supported on windows devices that can interpret unicode data. 
+
+--- 1.1. Prebuilt ---
+
+The :c interpreter has been constructed in the visual studio enviroment and thus is only buildable through said software.
+To minimize this issue, a folder called "Build" has been included which contains a prebuilt instance of the interpreter. 
+Inside this folder should be a number of files - but most importantly it should include the files "Interpreter.exe" and "CodeFile.txt".
+
+If Interpreter.exe is missing, then a manual build may be neccessary - inwhich case see segment 1.2 for how to fix this issue.
+If CodeFile.txt is missing then it is possible to simply create the file manually by making a new text file called "CodeFile.txt" (case sensitive) - though it should be noted that the text file must support unicode.
+
+--- 1.2. Manual Building ---
+
+If there is no Build folder or the Interpreter.exe file is missing or non functional, it may be necessary to conduct a manual build. 
+This can be done by opening the Interpreter.sln file inside the Interpreter folder with the visual studio program (preferably 2019). Once open, the keyboard shortcut Ctrl + Shift + B can be used to build the software.
+If this is done successfully, navigate into the Interpreter folder in the directory of the Interpreter.sln file, and then enter the bin folder (which may be hidden in some cases).
+When this is done, continue to open the folders presented until reaching a set of files including Interpreter.exe and CodeFile.txt. The entire contents of this directory can then be copied out to a seperate location and
+the Interpreter.exe folder can be used as normal.
+
+----- 100505349 University of Derby 100505349@Unimail.derby.ac.uk -----

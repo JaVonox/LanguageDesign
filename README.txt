@@ -6,6 +6,7 @@ This file will discuss the basic usage of the interpreter and the features and s
 
 --- CONTENTS ---
 1. Startup
+2. Syntax
 2.1. Data Types
 2.2. Operations
 2.3. General Syntax
@@ -27,6 +28,67 @@ If a CodeFile.txt file does not exist, create a new "CodeFile.txt" file in the s
 
 After ensuring a non-empty CodeFile.txt exists in the aforementioned directory, running the interpreter.exe file will both parse and execute the script.
 Example scripts can be found in the TestFiles folder in the same directory as this README file. To execute a script, simply copy the contents of a new script into the aforementioned CodeFile.txt file.
+
+Finally, the source code for the project can be found in the "Interpreter" folder, containing all the project files created by the visual studio enviroment.
+
+--- 2. Syntax ---
+Due to its focus on being a simple language, :c follows a simple design philosophy - each statement should have a single purpose. 
+New developers can often become confused by complex multi-stage functions, which is why the baseline :c code is designed to enforce simplicity by giving each item a single purpose.
+
+An example of this is in the python input function - inwhich, unintuitively, the parameter passed to the function actually represents an output to be made to console. 
+This design form prescribes two different functionalities to a single command - making the "input" command simultaneously function as a print command.
+In :c, the input command takes in a single input - the variable to which the input is to be assigned. 
+
+This is not to say that the aforementioned functionality cannot be achieved, but instead that it is seperated from:
+
+string a;
+a = input("give me an input");
+
+to
+
+string a;
+print("give me an input");
+input(a);
+
+giving each statement its own discreet function. 
+
+In fact this principle applies to all functions, including those that are user-made - in that no function will produce a return value. In many languages, there is little distinction made between a function that returns a
+value and a method that does not. Depending on the enviroment a new developer is working with, they may even have to consult documentation to determine if a function produces a return or not. This can be especially obtuse
+in situations where multiple returns are needed, especially in cases such as C#s Int32.TryParse() - which, while it returns one value, a boolean to express if an input value could be converted to an integer - it also requires
+an integer parameter to be passed by reference to store the output value in - effectively creating a second, hidden, return.
+
+This is not to say that functions cannot be used to modify variables, but instead that the statement itself produces no tokens. In essence, the C#:
+
+int a;
+int ExFunc()
+{
+	return 2;
+}
+a = ExFunc();
+
+would instead be expressed as
+
+int a;
+func(ExFunc)
+{
+	a = 2;
+};
+call(ExFunc);
+
+producing the same result - the updating of variable a to the value 2 - without overcomplicating the matter of return types. While this system does have some limitations, an experienced developer can circumvent these restrictions
+by using variables efficiently.
+
+Another area inwhich this can be seen is in the declaration of variables. Unlike traditional languages, there is no functionality to assign a value during declaration of a variable.
+Rather than 
+
+int a = 1;
+
+a user would input 
+
+int a;
+a = 1;
+
+once again splitting a multi-function operation into its components.
 
 --- 2.1. Data Types ---
 :c contains support for the following data types:
@@ -100,7 +162,7 @@ Boolean:
 
 --- 2.3 General Syntax ---
 The :c language follows a C derivative structure. each statement is expected to end with a semicolon, else the next line is considered part of the same statement.
-This principle extends to functions - including while and if statments. This principle is discussed further in the following segments.
+This principle extends to functions - including while and if statments. This is discussed further in the following segments.
 
 --- 2.4. Variables ---
 Variables may take the form of any of the aforementioned data types. Variables are typed statically, and attempts to assign an invalid value to a variable will cause errors.
@@ -208,10 +270,13 @@ Inside these subfolders there is a single CodeFile.txt file for each function. T
 In order of simplicity, the following example files exist:
 
 Mixed -
-	A variety of different simple expressions and methods demonstrating the core concepts of the interpreter. 
+	A variety of different simple expressions and methods demonstrating the core concepts of the interpreter. Based mostly on the example items given in the assignment specification.
 	
 Movement -
 	A simple top down movement system, inwhich a player is able to move around a 3x3 grid by using WASD inputs. 
+	
+TicTacToe -
+	A two player game of tic tac toe.
 	
 BoardGame -
 	A two player board game inwhich each player attempts to travel a number of spaces before the other. 
@@ -226,4 +291,4 @@ AIBlackjack -
 	10s, Jacks, Queens and Kings have the same value of 10. Each is shown with the first letter of their spelled name - "T" for 10, "J" for jack, "Q" for queen, "K" for king.
 
 
------ 100505349 University of Derby -----
+----- 100505349 University of Derby 100505349@Unimail.derby.ac.uk -----

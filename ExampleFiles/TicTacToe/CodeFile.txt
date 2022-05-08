@@ -1,0 +1,182 @@
+int T_L;
+int T_M;
+int T_R;
+
+int M_L;
+int M_M;
+int M_R;
+
+int B_L;
+int B_M;
+int B_R;
+
+string posMarker;
+int pos;
+int mark;
+func(MarkPos)
+{
+	posMarker = "";
+	mark = 0;
+
+	if(pos == 10){mark = T_L;};
+	if(pos == 11){mark = T_M;};
+	if(pos == 12){mark = T_R;};
+	if(pos == 20){mark = M_L;};
+	if(pos == 21){mark = M_M;};
+	if(pos == 22){mark = M_R;};
+	if(pos == 30){mark = B_L;};
+	if(pos == 31){mark = B_M;};
+	if(pos == 32){mark = B_R;};
+
+	if(mark == 0){posMarker="-";};
+	if(mark == 3){posMarker="X";};
+	if(mark == 4){posMarker="O";};
+};
+
+string tRow;
+string mRow;
+string bRow;
+
+func(DrawBoard)
+{
+	pos = 10;
+	tRow = "";
+	mRow = "";
+	bRow = "";
+
+	while(pos < 33)
+	{
+		call(MarkPos);
+		if(pos < 13){
+			tRow = tRow + posMarker;
+			if(pos == 10 || pos == 11)
+			{
+				tRow = tRow + "│";
+			};
+		};
+
+		if(pos < 23 && pos > 13){
+			mRow = mRow + posMarker;
+			if(pos == 20 || pos == 21)
+			{
+				mRow = mRow + "│";
+			};
+		};
+
+		if(pos < 33 && pos > 23){
+			bRow = bRow + posMarker;
+
+			if(pos == 30 || pos == 31)
+			{
+				bRow = bRow + "│";
+			};
+		};
+
+		if(pos == 13 || pos == 23){pos = pos + 6;};
+		pos = pos + 1;
+	};
+
+	print(" " +tRow);
+	print(" ─┼─┼─");
+	print(" " +mRow);
+	print(" ─┼─┼─");
+	print(" " +bRow);
+};
+
+bool hasWon;
+hasWon = false;
+
+int checkVal;
+checkVal = -1;
+func(CheckConnect)
+{
+	if(T_L + T_M + T_R == checkVal){hasWon = true;};
+	if(M_L + M_M + M_R == checkVal){hasWon = true;};
+	if(B_L + B_M + B_R == checkVal){hasWon = true;};
+
+	if(T_L + M_L + B_L == checkVal){hasWon = true;};
+	if(T_M + M_M + B_M == checkVal){hasWon = true;};
+	if(T_R + M_R + B_R == checkVal){hasWon = true;};
+
+	if(T_R + M_M + B_L == checkVal){hasWon = true;};
+	if(T_L + M_M + B_R == checkVal){hasWon = true;};
+};
+
+int player;
+player = 3;
+bool turnChange;
+turnChange = true;
+string vPos;
+string hPos;
+bool validInput;
+
+int turnCount;
+turnCount = 9;
+
+while(!hasWon && turnCount > 0)
+{
+	call(DrawBoard);
+	validInput = false;
+
+	print("Player " + (player-2) + "s turn!");
+
+	while(!validInput)
+	{
+		print("Select a vertical position - T for top, M for middle, B for bottom");
+		input(vPos);
+
+		print("Select a vertical position - L for left, M for middle, R for right");
+		input(hPos);
+
+		if(vPos == "T")
+		{
+			if(hPos == "L"){if(T_L==0){T_L = player;validInput=true;};};
+			if(hPos == "M"){if(T_M==0){T_M = player;validInput=true;};};
+			if(hPos == "R"){if(T_R==0){T_R = player;validInput=true;};};
+		};
+
+		if(vPos == "M")
+		{
+			if(hPos == "L"){if(M_L==0){M_L = player;validInput=true;};};
+			if(hPos == "M"){if(M_M==0){M_M = player;validInput=true;};};
+			if(hPos == "R"){if(M_R==0){M_R = player;validInput=true;};};
+		};
+
+		if(vPos == "B")
+		{
+			if(hPos == "L"){if(B_L==0){B_L = player;validInput=true;};};
+			if(hPos == "M"){if(B_M==0){B_M = player;validInput=true;};};
+			if(hPos == "R"){if(B_R==0){B_R = player;validInput=true;};};
+		};
+
+		if(validInput == false)
+		{
+			print("Input was invalid or was an occupied location. please try again.");
+		};
+	};
+
+	checkVal = player * 3;
+	call(CheckConnect);
+
+	if(!hasWon)
+	{
+		if(turnChange == true && player == 3){player = 4;turnChange = false;};
+		if(turnChange == true && player == 4){player = 3;turnChange = false;};
+
+		turnChange = true;
+
+		turnCount = turnCount - 1;
+
+		if(turnCount <= 0)
+		{
+			call(DrawBoard);
+			print("No winner!");
+		};
+	};
+	if(hasWon)
+	{
+		call(DrawBoard);
+		print("Player " + (player - 2) + " wins!");
+	};
+
+};
