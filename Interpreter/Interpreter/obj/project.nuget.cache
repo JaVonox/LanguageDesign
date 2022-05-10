@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "0N4VA2FobfLQvowT6KesU3T647fmjfuKsUYFvXCILC1DjZF6S1hM+ecO5NkNh3ByMZ3G3CGTnh7WEKe46Ep4CA==",
+  "dgSpecHash": "mDSibbFFF3taeT0scCqFSDi5KTgAc5EeKu6v7Nf3KDCj40lT05qHZvWQvsBAzg2fgfDRCYqyojJCuDa7dHOoag==",
   "success": true,
-  "projectFilePath": "C:\\Users\\redss\\Desktop\\GithubRepos\\LanguageDesign\\Interpreter\\Interpreter\\Interpreter.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\ldi\\Documents\\GitHub\\LanguageDesign\\Interpreter\\Interpreter\\Interpreter.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ldi\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.22\\microsoft.netcore.app.host.win-x64.3.1.22.nupkg.sha512",
+    "C:\\Users\\ldi\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "C:\\Users\\ldi\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\ldi\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512"
+  ],
   "logs": []
 }
